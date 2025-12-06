@@ -1,14 +1,12 @@
 import admin from 'firebase-admin';
 
-// This function must only be called on the server.
 function initializeFirebaseAdmin() {
-  // If the app is already initialized, don't do it again.
   if (admin.apps.length > 0) {
     return admin.apps[0];
   }
 
+  // Fallback to environment variables if they exist
   try {
-    // Attempt to use environment variables.
     const serviceAccountEnv = {
       type: process.env.FIREBASE_TYPE,
       project_id: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
@@ -31,8 +29,8 @@ function initializeFirebaseAdmin() {
       });
       return admin.apps[0];
     } else {
-        console.warn('⚠️ Firebase Admin credentials not found in environment variables. Server-side Firebase services will not be available.');
-        return null;
+      console.warn('⚠️ Firebase Admin credentials not found in environment variables. Server-side Firebase services will not be available.');
+      return null;
     }
   } catch (error: any) {
     console.error('❌ Firebase Admin SDK initialization error:', error.stack);
@@ -40,7 +38,6 @@ function initializeFirebaseAdmin() {
   }
 }
 
-// Initialize and export the services.
 const app = initializeFirebaseAdmin();
 export const adminDb = app ? admin.firestore() : null;
 export const adminStorage = app ? admin.storage() : null;
