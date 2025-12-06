@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Facebook, Instagram, Mail, MapPin, Printer } from 'lucide-react';
 import Link from 'next/link';
@@ -14,7 +15,7 @@ const Footer: React.FC = () => {
           <div className="text-center md:text-left">
              <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
               <Printer className="h-8 w-8 text-primary-500" />
-              <h3 className="text-xl font-bold text-white">BOMedia</h3>
+              <h3 className="text-xl font-bold text-white">Broad Options Media</h3>
             </div>
             <p className="text-sm">Large-format printing for Lagos businesses.</p>
             <p className="text-xs text-slate-500 mt-2">BN7243402</p>
