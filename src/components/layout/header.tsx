@@ -26,7 +26,7 @@ const Header: React.FC = () => {
           : 'bg-transparent py-5'
       }`}
     >
-      <div className="container flex items-center justify-between">
+      <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 z-50">
           <img
             src="/bomedia-logo.svg"
