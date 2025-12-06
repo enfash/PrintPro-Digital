@@ -2,10 +2,10 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { generateAdminEmailHTML, generateCustomerEmailHTML } from '@/lib/email-templates';
-import { EMAIL_DISPLAY } from '@/lib/constants';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM_EMAIL = 'BOMedia <noreply@bomedia.ng>'; // Must be a verified domain in Resend
+const ADMIN_EMAIL = 'bomedia03@gmail.com'; // Your actual email address
 
 export async function POST(request: Request) {
   try {
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     // 1. Send email to admin
     await resend.emails.send({
       from: FROM_EMAIL,
-      to: EMAIL_DISPLAY,
+      to: ADMIN_EMAIL,
       subject: `New Print Order: ${name} - ${jobType}`,
       html: generateAdminEmailHTML({
         name,
