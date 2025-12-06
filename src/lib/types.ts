@@ -1,14 +1,5 @@
 import type { LucideIcon } from 'lucide-react';
 
-export interface ContactFormData {
-    name: string;
-    phone: string;
-    email: string;
-    jobType: 'Flex Banner' | 'Self-Adhesive Vinyl (SAV)' | 'Window / Clear Sticker' | 'Other';
-    message: string;
-    file: File | null;
-}
-
 export interface NavItem {
     label: string;
     href: string;
@@ -38,4 +29,15 @@ export interface GalleryItem {
 export interface FAQItem {
     question: string;
     answer: string;
+}
+
+// This interface is no longer used in contact.tsx
+// but kept for potential future reference or other components.
+export interface ContactFormData {
+    name: string;
+    phone: string;
+    email: string;
+    jobType: 'Flex Banner' | 'Self-Adhesive Vinyl (SAV)' | 'Window / Clear Sticker' | 'Other';
+    message: string;
+    file: File | null;
 }

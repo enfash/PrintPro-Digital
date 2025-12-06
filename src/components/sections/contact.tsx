@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -6,109 +5,97 @@ import { Loader2, Upload, X, MessageCircle, CheckCircle, AlertCircle, Phone, Mai
 import { Button } from '@/components/ui/button';
 import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
-import { ContactFormData } from '@/lib/types';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 const Contact: React.FC = () => {
-  const [formData, setFormData] = useState<ContactFormData>({
-    name: '',
-    phone: '',
-    email: '',
-    jobType: 'Flex Banner',
-    message: '',
-    file: null
-  });
-  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [agreeToTerms, setAgreeToTerms] = useState(true); // Prechecked
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [agreeToTerms, setAgreeToTerms] = useState(true);
   const [showTermsModal, setShowTermsModal] = useState(false);
 
-  // Ref to clear file input after submission
+  const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  const { toast } = useToast();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      const maxSize = 25 * 1024 * 1024; // 25MB in bytes
+      const maxSize = 25 * 1024 * 1024; // 25MB
 
       if (selectedFile.size > maxSize) {
-        // File is too large
-        setStatus('error');
-        setErrorMessage(`File is too large (${(selectedFile.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 25MB. Please use WhatsApp to send larger files.`);
+        toast({
+          variant: 'destructive',
+          title: 'File Too Large',
+          description: `Max file size is 25MB. Please use WhatsApp for larger files.`,
+        });
         if (fileInputRef.current) {
-          fileInputRef.current.value = ''; // Clear the input
+          fileInputRef.current.value = '';
         }
+        setFile(null);
         return;
       }
-
-      setFormData(prev => ({ ...prev, file: selectedFile }));
+      setFile(selectedFile);
     }
   };
 
   const clearFile = (e: React.MouseEvent) => {
     e.preventDefault();
-    setFormData(prev => ({ ...prev, file: null }));
+    setFile(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     if (!agreeToTerms) {
-      setErrorMessage('Please agree to the Terms of Service');
+      toast({
+        variant: 'destructive',
+        title: 'Terms Required',
+        description: 'You must agree to the Terms of Service to submit.',
+      });
       return;
     }
 
-    setStatus('sending');
-    setErrorMessage('');
-    
-    // Use the API route to handle Firestore write, file upload, and email sending
-    const formDataForApi = new FormData();
-    formDataForApi.append('name', formData.name);
-    formDataForApi.append('phone', formData.phone);
-    formDataForApi.append('email', formData.email);
-    formDataForApi.append('jobType', formData.jobType);
-    formDataForApi.append('message', formData.message);
-    if (formData.file) {
-      formDataForApi.append('file', formData.file);
+    setIsLoading(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    if (file) {
+      formData.append('file', file);
     }
-    
+
     try {
-        const response = await fetch('/api/contact', {
-            method: 'POST',
-            body: formDataForApi,
-        });
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        body: formData,
+      });
 
-        const result = await response.json();
+      const result = await response.json();
 
-        if (!response.ok || !result.success) {
-            throw new Error(result.error || 'An unknown error occurred.');
-        }
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || 'An unknown error occurred.');
+      }
 
-        setStatus('success');
-        setFormData({ name: '', phone: '', email: '', jobType: 'Flex Banner', message: '', file: null });
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
+      setIsSuccess(true);
+      formRef.current?.reset();
+      setFile(null);
 
-    } catch (error) {
-        console.error('Submission error:', error);
-        setStatus('error');
-        let message = 'Failed to send your message. Please try WhatsApp instead.';
-        if (error instanceof Error) {
-            message = error.message;
-        }
-        setErrorMessage(message);
+    } catch (err: any) {
+      console.error('Submission error:', err);
+      setError(err.message || 'Failed to send your message. Please try WhatsApp instead.');
+    } finally {
+      setIsLoading(false);
     }
   };
-
+  
+  const resetForm = () => {
+    setIsSuccess(false);
+    setError(null);
+  }
 
   return (
     <section id="contact" className="py-16 lg:py-24 bg-white scroll-mt-16">
@@ -158,9 +145,8 @@ const Contact: React.FC = () => {
 
           {/* Right Side: Form */}
           <div className="bg-slate-50 rounded-3xl p-8 lg:p-10 border border-slate-100 shadow-sm relative overflow-hidden">
-
-            {/* Success Overlay */}
-            {status === 'success' && (
+            
+            {isSuccess && (
               <div className="absolute inset-0 bg-slate-50 flex flex-col items-center justify-center text-center p-8 z-20 animate-bounce-in">
                 <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
                   <CheckCircle size={32} />
@@ -169,27 +155,23 @@ const Contact: React.FC = () => {
                 <p className="text-slate-600 mb-6">
                   We have received your details. Our team will review and send you a price shortly.
                 </p>
-                <Button
-                  onClick={() => setStatus('idle')}
-                  variant="outline"
-                >
+                <Button onClick={resetForm} variant="outline">
                   Send another request
                 </Button>
               </div>
             )}
-
-            {/* Error Overlay */}
-            {status === 'error' && (
+            
+            {error && (
               <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-center p-8 z-20 animate-bounce-in">
                 <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6">
                   <AlertCircle size={32} />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">Something went wrong</h3>
                 <p className="text-slate-600 mb-6 max-w-xs mx-auto">
-                  {errorMessage || 'Unable to send your request at this time.'}
+                  {error}
                 </p>
                 <div className="flex gap-3">
-                  <Button onClick={() => setStatus('idle')} variant="secondary">
+                  <Button onClick={resetForm} variant="secondary">
                     Try Again
                   </Button>
                    <Button asChild variant="default" className="!bg-green-600 hover:!bg-green-700">
@@ -200,8 +182,8 @@ const Contact: React.FC = () => {
                 </div>
               </div>
             )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
+            
+            <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label htmlFor="name" className="text-sm font-medium text-slate-700">Name <span className="text-red-500">*</span></label>
@@ -210,10 +192,9 @@ const Contact: React.FC = () => {
                     id="name"
                     name="name"
                     required
-                    value={formData.name}
-                    onChange={handleInputChange}
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                     placeholder="Your name"
+                    disabled={isLoading}
                   />
                 </div>
                 <div className="space-y-2">
@@ -223,10 +204,9 @@ const Contact: React.FC = () => {
                     id="phone"
                     name="phone"
                     required
-                    value={formData.phone}
-                    onChange={handleInputChange}
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                     placeholder="080..."
+                    disabled={isLoading}
                   />
                 </div>
               </div>
@@ -237,10 +217,9 @@ const Contact: React.FC = () => {
                   type="email"
                   id="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
                   placeholder="john@example.com"
+                  disabled={isLoading}
                 />
               </div>
 
@@ -250,14 +229,14 @@ const Contact: React.FC = () => {
                   id="jobType"
                   name="jobType"
                   required
-                  value={formData.jobType}
-                  onChange={handleInputChange}
+                  defaultValue="Flex Banner"
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  disabled={isLoading}
                 >
-                  <option value="Flex Banner">Flex Banner</option>
-                  <option value="Self-Adhesive Vinyl (SAV)">Self-Adhesive Vinyl (SAV)</option>
-                  <option value="Window / Clear Sticker">Window / Clear Sticker</option>
-                  <option value="Other">Other</option>
+                  <option>Flex Banner</option>
+                  <option>Self-Adhesive Vinyl (SAV)</option>
+                  <option>Window / Clear Sticker</option>
+                  <option>Other</option>
                 </select>
               </div>
 
@@ -268,10 +247,9 @@ const Contact: React.FC = () => {
                   name="message"
                   required
                   rows={4}
-                  value={formData.message}
-                  onChange={handleInputChange}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none"
                   placeholder="Size, quantity, deadline, any notes..."
+                  disabled={isLoading}
                 />
               </div>
 
@@ -281,25 +259,26 @@ const Contact: React.FC = () => {
                   <input
                     type="file"
                     id="file"
-                    name="file"
+                    name="file-input" // Note: name is not 'file' to prevent it being added to FormData twice
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     className="hidden"
+                    disabled={isLoading}
                   />
                   <label
                     htmlFor="file"
-                    className={`flex items-center justify-center w-full px-4 py-4 border-2 border-dashed rounded-xl cursor-pointer bg-white transition-all ${formData.file
+                    className={`flex items-center justify-center w-full px-4 py-4 border-2 border-dashed rounded-xl cursor-pointer bg-white transition-all ${file
                       ? 'border-primary-500 bg-primary-50/50 text-primary-700'
                       : 'border-slate-300 text-slate-500 hover:border-primary-400 hover:bg-slate-50'
-                      }`}
+                      } ${isLoading ? 'cursor-not-allowed opacity-50' : ''}`}
                   >
-                    {formData.file ? (
+                    {file ? (
                       <div className="flex items-center w-full justify-between">
                         <div className="flex items-center overflow-hidden">
                           <FileCheck className="mr-2 h-5 w-5 flex-shrink-0" />
-                          <span className="truncate font-medium">{formData.file.name}</span>
+                          <span className="truncate font-medium">{file.name}</span>
                           <span className="ml-2 text-xs opacity-70 flex-shrink-0">
-                            ({(formData.file.size / 1024 / 1024).toFixed(2)} MB)
+                            ({(file.size / 1024 / 1024).toFixed(2)} MB)
                           </span>
                         </div>
                         <button
@@ -319,7 +298,6 @@ const Contact: React.FC = () => {
                 </div>
               </div>
 
-              {/* Terms Acknowledgment - Single prechecked checkbox */}
               <div className="flex items-start gap-3 pt-4 pb-2 border-t border-slate-200">
                 <div className="flex h-6 items-center">
                   <input
@@ -348,16 +326,15 @@ const Contact: React.FC = () => {
 
               <Button
                 type="submit"
-                variant="default"
                 size="lg"
                 className="w-full"
-                disabled={status === 'sending'}
+                disabled={isLoading}
               >
-                {status === 'sending' ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Sending...
-                  </div>
+                  </>
                 ) : (
                   'Get Price'
                 )}
@@ -366,8 +343,6 @@ const Contact: React.FC = () => {
           </div>
         </div>
       </div>
-
-      {/* Terms Modal */}
       <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
     </section>
   );
