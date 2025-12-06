@@ -1,52 +1,72 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Layers, Monitor, Palmtree } from 'lucide-react';
+'use client';
 
-const services = [
-  {
-    icon: <Layers className="h-8 w-8 text-primary-600" />,
-    title: 'Flex & SAV Banners',
-    description: 'Durable, high-resolution flex and self-adhesive vinyl (SAV) banners for indoor and outdoor advertising.',
-  },
-  {
-    icon: <Monitor className="h-8 w-8 text-primary-600" />,
-    title: 'Window Graphics',
-    description: 'Transform your storefront with custom window decals and graphics that attract customers and enhance your brand.',
-  },
-  {
-    icon: <Palmtree className="h-8 w-8 text-primary-600" />,
-    title: '3D Signage & Lettering',
-    description: 'Make a bold statement with custom 3D signs and lettering that add depth and professionalism to your space.',
-  },
-];
+import React, { useEffect, useRef, useState } from 'react';
+import { SERVICES } from '@/lib/constants';
 
-export default function Services() {
+const Services: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section id="services" className="w-full py-12 md:py-24 lg:py-32">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <div className="inline-block rounded-lg bg-muted px-3 py-1 text-sm">Our Services</div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">What We Print</h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              We specialize in a wide range of large format printing solutions tailored to meet your business needs in Lagos and beyond.
-            </p>
-          </div>
+    <section id="services" className="py-16 lg:py-24 bg-white relative scroll-mt-16">
+      <div className="container mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
+            What we print
+            <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+          </h2>
+          <p className="text-lg text-slate-600">
+            Focused large-format printing for brands, shops and events in Lagos.
+          </p>
         </div>
-        <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:grid-cols-3 lg:gap-12 mt-12">
-          {services.map((service) => (
-            <Card key={service.title} className="shadow-md hover:shadow-xl transition-shadow duration-300">
-              <CardHeader className="flex flex-row items-center gap-4">
-                {service.icon}
-                <CardTitle className="text-lg">{service.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">{service.description}</p>
-              </CardContent>
-            </Card>
+
+        <div ref={containerRef} className="grid md:grid-cols-3 gap-8">
+          {SERVICES.map((service, index) => (
+            <div 
+              key={service.id} 
+              className={`group relative p-8 bg-slate-50 rounded-2xl border border-slate-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300 ${isVisible ? 'animate-bounce-in' : 'opacity-0'}`}
+              style={{ animationDelay: `${index * 150}ms` }}
+            >
+              <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">
+                <service.icon size={24} />
+              </div>
+              
+              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary-700 transition-colors">
+                {service.title}
+              </h3>
+              
+              <p className="text-slate-600 mb-6 leading-relaxed">
+                {service.description}
+              </p>
+              
+              <div className="inline-flex items-center text-xs font-semibold text-primary-700 bg-primary-50 px-3 py-1 rounded-full">
+                {service.meta}
+              </div>
+            </div>
           ))}
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default Services;

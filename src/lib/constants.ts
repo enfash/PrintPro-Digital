@@ -1,4 +1,4 @@
-import { UploadCloud, PencilRuler, Rocket } from 'lucide-react';
+import { UploadCloud, PencilRuler, Rocket, Layers, Image, Palmtree } from 'lucide-react';
 
 export const WHATSAPP_NUMBER = "2348012345678";
 export const GREETING_MESSAGE = "Hello BOMedia, I'm interested in your printing services.";
@@ -86,3 +86,26 @@ export const CORPORATE_FAQS = [
 export const WHATSAPP_CORPORATE_GREETING = "Hello BOMedia, I'd like to make a corporate/bulk order inquiry.";
 export const WHATSAPP_CORPORATE_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_CORPORATE_GREETING)}`;
     
+export const SERVICES = [
+  {
+    id: 1,
+    icon: Layers,
+    title: 'Flex & SAV Banners',
+    description: 'Durable, high-resolution flex and self-adhesive vinyl (SAV) banners for indoor and outdoor advertising.',
+    meta: 'Events, Billboards, Signage'
+  },
+  {
+    id: 2,
+    icon: Image,
+    title: 'Window Graphics',
+    description: 'Transform your storefront with custom window decals and graphics that attract customers and enhance your brand.',
+    meta: 'Shops, Offices, Restaurants'
+  },
+  {
+    id: 3,
+    icon: Palmtree,
+    title: '3D Signage & Lettering',
+    description: 'Make a bold statement with custom 3D signs and lettering that add depth and professionalism to your space.',
+    meta: 'Corporate, Retail, Hospitality'
+  },
+];
