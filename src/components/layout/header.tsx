@@ -1,59 +1,86 @@
-
 'use client';
 
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NAV_LINKS } from '@/lib/constants';
 
-const navLinks = [
-  { href: '/#services', label: 'Services' },
-  { href: '/#gallery', label: 'Our Work' },
-  { href: '/#testimonials', label: 'Testimonials' },
-  { href: '/#contact', label: 'Contact Us' },
-];
+const Header: React.FC = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-export default function Header() {
-  const [isOpen, setIsOpen] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-          <Printer className="h-6 w-6 text-primary-600" />
-          <span className="font-bold sm:inline-block font-headline">PrintPro Digital</span>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled || isMobileMenuOpen
+          ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-100 py-3'
+          : 'bg-transparent py-5'
+      }`}
+    >
+      <div className="container flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 z-50">
+          <Printer className="h-8 w-8 text-primary-600" />
+          <span className="font-bold text-lg">BOMedia</span>
         </Link>
-        <nav className="hidden gap-6 md:flex">
-          {navLinks.map((link) => (
-            <Link key={link.href} href={link.href} className="text-sm font-medium text-muted-foreground transition-colors hover:text-primary-600">
+
+        <nav className="hidden md:flex items-center gap-8">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="text-sm font-medium text-slate-600 hover:text-primary-600 transition-colors"
+            >
               {link.label}
             </Link>
           ))}
-        </nav>
-        <div className="flex flex-1 items-center justify-end gap-2">
-          <Button asChild className="hidden md:flex" variant="outline">
+          <Button asChild variant="outline" size="sm">
             <Link href="/#contact">Get a Quote</Link>
           </Button>
-          <Button variant="ghost" className="md:hidden" onClick={() => setIsOpen(!isOpen)} size="icon">
-            {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            <span className="sr-only">Toggle Menu</span>
+        </nav>
+
+        <button
+          className="md:hidden z-50 p-2 text-slate-600 hover:text-slate-900"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      <div
+        className={`fixed inset-0 bg-white z-40 transform transition-transform duration-300 ease-in-out md:hidden flex flex-col pt-24 px-6 ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex flex-col gap-6 text-lg font-medium">
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="text-slate-800 hover:text-primary-600 border-b border-slate-100 pb-4"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          <Button asChild variant="default" className="mt-4 w-full">
+            <Link href="/#contact" onClick={() => setIsMobileMenuOpen(false)}>
+              Get a Quote
+            </Link>
           </Button>
         </div>
       </div>
-      {isOpen && (
-        <div className="md:hidden animate-in fade-in-20 slide-in-from-top-4">
-          <div className="container flex flex-col gap-2 pb-4">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} onClick={() => setIsOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-primary-600 hover:bg-muted">
-                {link.label}
-              </Link>
-            ))}
-            <Button asChild className="mt-2" variant="outline">
-              <Link href="/#contact" onClick={() => setIsOpen(false)}>Get a Quote</Link>
-            </Button>
-          </div>
-        </div>
-      )}
     </header>
   );
-}
+};
+
+export default Header;
