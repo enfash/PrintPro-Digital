@@ -2,9 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, Printer } from 'lucide-react';
+import { Menu, X, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NAV_LINKS } from '@/lib/constants';
+import { NAV_LINKS, WHATSAPP_LINK } from '@/lib/constants';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -28,10 +28,14 @@ const Header: React.FC = () => {
     >
       <div className="container flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 z-50">
-          <Printer className="h-8 w-8 text-primary-600" />
-          <span className="font-bold text-lg">BOMedia</span>
+          <img
+            src="/bomedia-logo.svg"
+            alt="BOMedia"
+            className="h-12 w-auto"
+          />
         </Link>
 
+        {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((link) => (
             <Link
@@ -42,8 +46,11 @@ const Header: React.FC = () => {
               {link.label}
             </Link>
           ))}
-          <Button asChild variant="outline" size="sm">
-            <Link href="/#contact">Get a Quote</Link>
+          <Button asChild variant="outline" size="sm" className="gap-2 !border-green-600 !text-green-700 hover:!bg-green-50">
+            <Link href={WHATSAPP_LINK} target="_blank">
+              <MessageCircle size={16} />
+              WhatsApp Quote
+            </Link>
           </Button>
         </nav>
 
@@ -72,9 +79,10 @@ const Header: React.FC = () => {
               {link.label}
             </Link>
           ))}
-          <Button asChild variant="default" className="mt-4 w-full">
-            <Link href="/#contact" onClick={() => setIsMobileMenuOpen(false)}>
-              Get a Quote
+          <Button asChild className="mt-4 gap-2 w-full !bg-green-600 hover:!bg-green-700">
+            <Link href={WHATSAPP_LINK} target="_blank" >
+              <MessageCircle size={18} />
+              WhatsApp Quote
             </Link>
           </Button>
         </div>
