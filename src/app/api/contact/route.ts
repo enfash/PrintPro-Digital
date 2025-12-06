@@ -1,103 +1,165 @@
-import { NextResponse } from 'next/server';
-import nodemailer from 'nodemailer';
-import { Buffer } from 'buffer';
+import { NextRequest, NextResponse } from 'next/server';
+import { adminDb, adminStorage } from '@/lib/firebaseAdmin';
+import { resend, RESEND_FROM_EMAIL, RESEND_TO_EMAIL } from '@/lib/resend';
+import { generateAdminEmailHTML, generateCustomerEmailHTML } from '@/lib/email-template';
 
-export async function POST(request: Request) {
-  try {
-    const formData = await request.formData();
+export const runtime = 'nodejs';
 
-    const name = formData.get('name') as string;
-    const phone = formData.get('phone') as string;
-    const email = formData.get('email') as string;
-    const jobType = formData.get('jobType') as string;
-    const message = formData.get('message') as string;
-    const agreeToUpdates = formData.get('agreeToUpdates') === 'true';
-    const file = formData.get('file') as File | null;
+export async function POST(request: NextRequest) {
+    try {
+        // Parse form data
+        const formData = await request.formData();
 
-    // Configure Nodemailer Transporter using Gmail SMTP
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure: Number(process.env.SMTP_SECURE) === 1,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+        const name = formData.get('name') as string;
+        const phone = formData.get('phone') as string;
+        const email = formData.get('email') as string || '';
+        const jobType = formData.get('jobType') as string;
+        const message = formData.get('message') as string;
+        const agreeToUpdates = formData.get('agreeToUpdates') === 'true';
+        const file = formData.get('file') as File | null;
 
-    // Prepare email content
-    const textMessage = `
-Name: ${name}
-Phone: ${phone}
-Email: ${email || 'Not provided'}
-Job Type: ${jobType}
-Message: ${message}
-Agreed to Updates: ${agreeToUpdates ? 'Yes' : 'No'}
-    `;
+        // Validate required fields
+        if (!name || !phone || !jobType || !message) {
+            return NextResponse.json(
+                { success: false, error: 'Missing required fields' },
+                { status: 400 }
+            );
+        }
 
-    const htmlMessage = `
-      <h2>New Quote Request from BOMedia Website</h2>
-      <p><strong>Name:</strong> ${name}</p>
-      <p><strong>Phone:</strong> ${phone}</p>
-      <p><strong>Email:</strong> ${email || 'Not provided'}</p>
-      <p><strong>Job Type:</strong> ${jobType}</p>
-      <p><strong>Message:</strong></p>
-      <p style="background-color: #f3f4f6; padding: 10px; border-radius: 4px;">${message.replace(/\n/g, '<br>')}</p>
-      <p><strong>Agreed to Updates:</strong> ${agreeToUpdates ? 'Yes' : 'No'}</p>
-    `;
+        let fileUrl: string | null = null;
+        let fileName: string | null = null;
+        let fileSize: number | null = null;
+        let fileBuffer: Buffer | null = null;
 
-    // Handle Attachment
-    let attachments = [];
-    if (file && file.size > 0) {
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      attachments.push({
-        filename: file.name,
-        content: buffer,
-      });
+        // Handle file upload to Firebase Storage
+        if (file) {
+            try {
+                fileName = file.name;
+                fileSize = file.size;
+
+                // Convert file to buffer
+                const arrayBuffer = await file.arrayBuffer();
+                fileBuffer = Buffer.from(arrayBuffer);
+
+                // Upload to Firebase Storage
+                const bucket = adminStorage.bucket();
+                const timestamp = Date.now();
+                const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const storagePath = `submissions/${timestamp}_${sanitizedFileName}`;
+
+                const fileUpload = bucket.file(storagePath);
+
+                await fileUpload.save(fileBuffer, {
+                    metadata: {
+                        contentType: file.type,
+                    },
+                });
+
+                // Make file publicly accessible
+                await fileUpload.makePublic();
+
+                // Get public URL
+                fileUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+            } catch (uploadError: any) {
+                console.error('File upload error:', uploadError);
+                return NextResponse.json(
+                    { success: false, error: 'Failed to upload file' },
+                    { status: 500 }
+                );
+            }
+        }
+
+        // Generate a short unique reference ID
+        const refId = Math.random().toString(36).substring(2, 7).toUpperCase();
+
+        // Save to Firestore
+        try {
+            const submissionData = {
+                refId, // Save refId
+                name,
+                phone,
+                email,
+                jobType,
+                message,
+                agreeToUpdates,
+                fileUrl,
+                fileName,
+                fileSize,
+                createdAt: new Date().toISOString(),
+                status: 'new',
+            };
+
+            const docRef = await adminDb.collection('submissions').add(submissionData);
+            console.log(`✅ Submission saved to Firestore: ${docRef.id} [${refId}]`);
+        } catch (dbError: any) {
+            console.error('Firestore error:', dbError);
+            return NextResponse.json(
+                { success: false, error: 'Failed to save submission' },
+                { status: 500 }
+            );
+        }
+
+        // Send emails via Resend
+        try {
+            const adminEmailHTML = generateAdminEmailHTML({
+                name,
+                phone,
+                email,
+                jobType,
+                message,
+                fileName: fileName || undefined,
+                fileSize: fileSize || undefined,
+                agreeToUpdates,
+            });
+
+            // Prepare attachments for admin email
+            const attachments = fileBuffer && fileName
+                ? [{
+                    filename: fileName,
+                    content: fileBuffer,
+                }]
+                : [];
+
+            // Send admin notification
+            await resend.emails.send({
+                from: RESEND_FROM_EMAIL,
+                to: RESEND_TO_EMAIL,
+                subject: `[#${refId}] New Order: ${jobType} - ${name}`,
+                html: adminEmailHTML,
+                attachments,
+            });
+
+            console.log('✅ Admin email sent');
+
+            // Send customer confirmation (if email provided)
+            if (email) {
+                const customerEmailHTML = generateCustomerEmailHTML(name, jobType);
+
+                await resend.emails.send({
+                    from: RESEND_FROM_EMAIL,
+                    to: email,
+                    subject: `Order Received [#${refId}] - BOMedia`,
+                    html: customerEmailHTML,
+                });
+
+                console.log('✅ Customer confirmation sent');
+            }
+        } catch (emailError: any) {
+            console.error('Email sending error:', emailError);
+            // Don't fail the request if email fails - data is already saved
+            console.warn('⚠️ Email failed but submission was saved');
+        }
+
+        return NextResponse.json({
+            success: true,
+            message: 'Order received successfully',
+        });
+
+    } catch (error: any) {
+        console.error('❌ API error:', error);
+        return NextResponse.json(
+            { success: false, error: 'Internal server error', details: error.message },
+            { status: 500 }
+        );
     }
-
-    // Generate a short unique reference ID
-    const refId = Math.random().toString(36).substring(2, 7).toUpperCase();
-
-    // Send Mail
-    await transporter.sendMail({
-      from: `"BOMedia Web" <${process.env.SMTP_USER}>`,
-      to: process.env.MAIL_TO,
-      replyTo: email || undefined,
-      subject: `[#${refId}] New Quote Request: ${jobType} - ${name}`,
-      text: textMessage,
-      html: htmlMessage,
-      attachments: attachments,
-    });
-
-    // Optionally send a confirmation email to the customer
-    if (email) {
-      const customerHtmlMessage = `
-        <h2>Thank You for Your Quote Request!</h2>
-        <p>Hi ${name},</p>
-        <p>We've received your request for a <strong>${jobType}</strong> and will get back to you with a quote shortly.</p>
-        <p>Your reference ID is <strong>#${refId}</strong>.</p>
-        <br>
-        <p>Best regards,</p>
-        <p><strong>The BOMedia Team</strong></p>
-      `;
-      await transporter.sendMail({
-        from: `"BOMedia" <${process.env.SMTP_USER}>`,
-        to: email,
-        subject: `Your Quote Request [#${refId}] Has Been Received`,
-        html: customerHtmlMessage,
-      });
-    }
-
-
-    return NextResponse.json({ success: true, message: 'Email sent successfully' });
-
-  } catch (error) {
-    console.error('Email API Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to send email' },
-      { status: 500 }
-    );
-  }
 }
