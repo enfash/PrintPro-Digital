@@ -7,7 +7,6 @@ export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
     try {
-        // Parse form data
         const formData = await request.formData();
 
         const name = formData.get('name') as string;
@@ -18,7 +17,6 @@ export async function POST(request: NextRequest) {
         const agreeToUpdates = formData.get('agreeToUpdates') === 'true';
         const file = formData.get('file') as File | null;
 
-        // Validate required fields
         if (!name || !phone || !jobType || !message) {
             return NextResponse.json(
                 { success: false, error: 'Missing required fields' },
@@ -31,51 +29,54 @@ export async function POST(request: NextRequest) {
         let fileSize: number | null = null;
         let fileBuffer: Buffer | null = null;
 
-        // Handle file upload to Firebase Storage
+        // Handle file upload
         if (file) {
             try {
                 fileName = file.name;
                 fileSize = file.size;
-
-                // Convert file to buffer
                 const arrayBuffer = await file.arrayBuffer();
                 fileBuffer = Buffer.from(arrayBuffer);
 
-                // Upload to Firebase Storage
-                const bucket = adminStorage.bucket();
+                // 1. Explicitly get the bucket (Best Practice: Use your env var here if the default isn't set)
+                // If this fails, ensure your initialized app in lib/firebaseAdmin has 'storageBucket' defined.
+                const bucket = adminStorage.bucket(); 
+                
                 const timestamp = Date.now();
                 const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
                 const storagePath = `submissions/${timestamp}_${sanitizedFileName}`;
-
                 const fileUpload = bucket.file(storagePath);
 
+                // 2. Save file
                 await fileUpload.save(fileBuffer, {
-                    metadata: {
-                        contentType: file.type,
-                    },
+                    metadata: { contentType: file.type },
                 });
 
-                // Make file publicly accessible
-                await fileUpload.makePublic();
+                // 3. FIXED: Generate a long-lived Signed URL instead of makePublic()
+                // This bypasses the "Uniform Bucket Level Access" error
+                const [signedUrl] = await fileUpload.getSignedUrl({
+                    action: 'read',
+                    expires: '01-01-2030', // Set a long expiration date
+                });
 
-                // Get public URL
-                fileUrl = `https://storage.googleapis.com/${bucket.name}/${storagePath}`;
+                fileUrl = signedUrl;
+
             } catch (uploadError: any) {
-                console.error('File upload error:', uploadError);
+                console.error('File upload error detailed:', uploadError);
+                // Return the ACTUAL error message to the client for debugging
                 return NextResponse.json(
-                    { success: false, error: 'Failed to upload file' },
+                    { success: false, error: `Upload failed: ${uploadError.message}` },
                     { status: 500 }
                 );
             }
         }
 
-        // Generate a short unique reference ID
+        // Generate ID
         const refId = Math.random().toString(36).substring(2, 7).toUpperCase();
 
         // Save to Firestore
         try {
             const submissionData = {
-                refId, // Save refId
+                refId,
                 name,
                 phone,
                 email,
@@ -89,8 +90,7 @@ export async function POST(request: NextRequest) {
                 status: 'new',
             };
 
-            const docRef = await adminDb.collection('submissions').add(submissionData);
-            console.log(`✅ Submission saved to Firestore: ${docRef.id} [${refId}]`);
+            await adminDb.collection('submissions').add(submissionData);
         } catch (dbError: any) {
             console.error('Firestore error:', dbError);
             return NextResponse.json(
@@ -99,28 +99,19 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Send emails via Resend
+        // Emails (Resend)
         try {
             const adminEmailHTML = generateAdminEmailHTML({
-                name,
-                phone,
-                email,
-                jobType,
-                message,
+                name, phone, email, jobType, message,
                 fileName: fileName || undefined,
                 fileSize: fileSize || undefined,
                 agreeToUpdates,
             });
 
-            // Prepare attachments for admin email
             const attachments = fileBuffer && fileName
-                ? [{
-                    filename: fileName,
-                    content: fileBuffer,
-                }]
+                ? [{ filename: fileName, content: fileBuffer }]
                 : [];
 
-            // Send admin notification
             await resend.emails.send({
                 from: RESEND_FROM_EMAIL,
                 to: RESEND_TO_EMAIL,
@@ -129,25 +120,17 @@ export async function POST(request: NextRequest) {
                 attachments,
             });
 
-            console.log('✅ Admin email sent');
-
-            // Send customer confirmation (if email provided)
             if (email) {
                 const customerEmailHTML = generateCustomerEmailHTML(name, jobType);
-
                 await resend.emails.send({
                     from: RESEND_FROM_EMAIL,
                     to: email,
                     subject: `Order Received [#${refId}] - BOMedia`,
                     html: customerEmailHTML,
                 });
-
-                console.log('✅ Customer confirmation sent');
             }
         } catch (emailError: any) {
             console.error('Email sending error:', emailError);
-            // Don't fail the request if email fails - data is already saved
-            console.warn('⚠️ Email failed but submission was saved');
         }
 
         return NextResponse.json({
