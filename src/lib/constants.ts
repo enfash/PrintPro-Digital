@@ -1,3 +1,4 @@
+import { UploadCloud, PencilRuler, Rocket } from 'lucide-react';
 
 export const WHATSAPP_NUMBER = "2348012345678";
 export const GREETING_MESSAGE = "Hello BOMedia, I'm interested in your printing services.";
@@ -9,11 +10,33 @@ export const EMAIL_DISPLAY = "info@bomedia.ng";
 
 export const NAV_LINKS = [
   { href: '/#services', label: 'Services' },
+  { href: '/#how-it-works', label: 'How It Works' },
   { href: '/#gallery', label: 'Our Work' },
-  { href: '/#testimonials', label: 'Testimonials' },
   { href: '/#faq', label: 'FAQs' },
   { href: '/#contact', label: 'Contact' },
 ];
+
+export const TIMELINE_STEPS = [
+  {
+    id: 1,
+    icon: UploadCloud,
+    title: '1. Send Your Artwork',
+    description: 'Use our contact form or WhatsApp to upload your design file and tell us what you need—size, quantity, and finish.',
+  },
+  {
+    id: 2,
+    icon: PencilRuler,
+    title: '2. Review & Approve',
+    description: 'We will review your artwork, send you a digital proof and a final price. Once you approve and pay, we start printing.',
+  },
+  {
+    id: 3,
+    icon: Rocket,
+    title: '3. Receive Your Prints',
+    description: 'We print and finish your job with high-quality materials. We then deliver it to your doorstep anywhere in Lagos.',
+  },
+];
+
 
 export const FAQS = [
   {
