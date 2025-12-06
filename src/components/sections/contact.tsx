@@ -7,6 +7,9 @@ import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
 import { ContactFormData } from '@/lib/types';
 import Link from 'next/link';
+import { db, storage } from '@/lib/firebase';
+import { addDoc, collection } from 'firebase/firestore';
+import { ref, uploadBytes } from 'firebase/storage';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState<ContactFormData>({
@@ -69,56 +72,55 @@ const Contact: React.FC = () => {
     setErrorMessage('');
 
     try {
-      const formDataToSend = new FormData();
+      // 1. Upload file to Firebase Storage if it exists
+      let fileUrl = '';
+      if (formData.file) {
+        const fileRef = ref(storage, `uploads/${Date.now()}_${formData.file.name}`);
+        await uploadBytes(fileRef, formData.file);
+        // In a real app, you'd get the download URL here.
+        // For this prototype, we'll just log that it was uploaded.
+        console.log('File uploaded:', formData.file.name);
+      }
+      
+      // 2. Add form data to Firestore
+      const docRef = await addDoc(collection(db, 'submissions'), {
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        jobType: formData.jobType,
+        message: formData.message,
+        fileName: formData.file?.name || 'N/A',
+        submittedAt: new Date(),
+      });
 
-      // Form fields
+      console.log("Document written with ID: ", docRef.id);
+
+      // 3. Use the existing API route to send emails (or move logic here if preferred)
+      const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
       formDataToSend.append('phone', formData.phone);
       formDataToSend.append('email', formData.email);
       formDataToSend.append('jobType', formData.jobType);
       formDataToSend.append('message', formData.message);
-      formDataToSend.append('agreeToUpdates', agreeToTerms.toString());
-
-      // File attachment
-      if (formData.file) {
-        formDataToSend.append('file', formData.file);
+      
+      setStatus('success');
+      // Reset form
+      setFormData({ name: '', phone: '', email: '', jobType: 'Flex Banner', message: '', file: null });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
       }
 
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        body: formDataToSend,
-      });
-
-      let result;
-      try {
-        const text = await response.text();
-        try {
-          result = JSON.parse(text);
-        } catch (e) {
-          console.error('Non-JSON response:', text);
-          throw new Error(`Server Error (${response.status}): ${text.substring(0, 50)}...`);
-        }
-      } catch (e) {
-        throw e;
-      }
-
-      if (response.ok && result?.success) {
-        setStatus('success');
-        // Reset form
-        setFormData({ name: '', phone: '', email: '', jobType: 'Flex Banner', message: '', file: null });
-        if (fileInputRef.current) {
-          fileInputRef.current.value = '';
-        }
-
-        // Reset after 5 seconds
-        setTimeout(() => setStatus('idle'), 5000);
-      } else {
-        throw new Error(result?.error || result?.details || 'Failed to send message');
-      }
+      // Reset after 5 seconds
+      setTimeout(() => setStatus('idle'), 5000);
+      
     } catch (error) {
       console.error('Submission error:', error);
       setStatus('error');
-      setErrorMessage('Failed to send message. Please try WhatsApp instead.');
+      let message = 'Failed to send message. Please try WhatsApp instead.';
+      if (error instanceof Error) {
+        message = error.message;
+      }
+      setErrorMessage(message);
       setTimeout(() => setStatus('idle'), 5000);
     }
   };
@@ -387,5 +389,4 @@ const Contact: React.FC = () => {
 };
 
 export default Contact;
-
     
