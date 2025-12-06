@@ -1,0 +1,11 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow anyone to create a submission.
+    // This is for the contact form.
+    match /submissions/{submissionId} {
+      allow create: if true;
+    }
+  }
+}
