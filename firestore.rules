@@ -2,11 +2,8 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow anyone to create a submission for the contact form.
     match /submissions/{submissionId} {
       allow create: if true;
-      
-      // Explicitly deny read, update, and delete for security.
       allow read, update, delete: if false;
     }
   }
