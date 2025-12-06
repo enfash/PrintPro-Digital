@@ -1,37 +1,102 @@
+'use client';
 
-import Image from 'next/image';
+import React from 'react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import Image from 'next/image';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
-const galleryImages = PlaceHolderImages.filter(img => img.id.startsWith('gallery-'));
+const GALLERY_ITEMS = PlaceHolderImages.filter(img => img.id.startsWith('gallery-')).map(item => ({
+  id: item.id,
+  imageUrl: item.imageUrl,
+  caption: item.description,
+  hint: item.imageHint
+}));
 
-export default function Gallery() {
+
+const Gallery: React.FC = () => {
+  const [activeIndex, setActiveIndex] = React.useState(2); // The focused item index relative to the visible window (0-3)
+  const [startIndex, setStartIndex] = React.useState(0); // The starting index of the visible slice
+
+  const visibleItems = [];
+  const totalItems = GALLERY_ITEMS.length;
+  for (let i = 0; i < 4; i++) {
+    visibleItems.push(GALLERY_ITEMS[(startIndex + i) % totalItems]);
+  }
+
+  const handleNext = () => {
+    setStartIndex((prev) => (prev + 1) % totalItems);
+  };
+
+  const handlePrev = () => {
+    setStartIndex((prev) => (prev - 1 + totalItems) % totalItems);
+  };
+
   return (
-    <section id="gallery" className="w-full py-12 md:py-24 lg:py-32 bg-primary-50">
-      <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center">
-          <div className="space-y-2">
-            <div className="inline-block rounded-lg bg-background px-3 py-1 text-sm">Our Work</div>
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl font-headline">A Glimpse of Our Quality</h2>
-            <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-              We take pride in our craft. Here are some examples of the vibrant and high-impact prints we've delivered for our clients.
-            </p>
+    <section id="gallery" className="py-16 lg:py-24 bg-white relative scroll-mt-16">
+      <div className="container">
+        <div className="mb-12 flex justify-between items-end">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
+              Recent prints
+            </h2>
+            <p className="text-lg text-slate-600">Some of our work around Lagos.</p>
+          </div>
+
+          {/* Navigation Buttons */}
+          <div className="hidden md:flex gap-4">
+            <button
+              onClick={handlePrev}
+              className="p-3 rounded-full hover:bg-slate-100 border border-slate-200 text-slate-600 transition-colors"
+              aria-label="Previous"
+            >
+              <ArrowLeft size={20} />
+            </button>
+            <button
+              onClick={handleNext}
+              className="p-3 rounded-full hover:bg-slate-100 border border-slate-200 text-slate-600 transition-colors"
+              aria-label="Next"
+            >
+              <ArrowRight size={20} />
+            </button>
           </div>
         </div>
-        <div className="mt-12 columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
-          {galleryImages.map((image, index) => (
-            <div key={image.id} className="overflow-hidden rounded-lg shadow-lg break-inside-avoid">
-              <Image
-                src={image.imageUrl}
-                alt={image.description}
-                data-ai-hint={image.imageHint}
-                width={800}
-                height={600}
-                className="h-auto w-full object-cover transition-transform duration-300 hover:scale-105"
-              />
-            </div>
-          ))}
+
+        <div className="flex flex-col md:flex-row w-full items-center justify-center gap-3">
+          {visibleItems.map((item, index) => {
+            const isActive = index === activeIndex;
+
+            return (
+              <div
+                key={`${item.id}-${startIndex}`}
+                className={`group relative cursor-pointer overflow-hidden rounded-3xl w-full h-[min(28rem,50vh)] transition-[width] duration-500 ease-in-out ${isActive ? 'md:w-[46%]' : 'md:w-[18%]'
+                  }`}
+                onMouseEnter={() => setActiveIndex(index)}
+              >
+                <Image
+                  src={item.imageUrl}
+                  alt={item.caption}
+                  fill
+                  data-ai-hint={item.hint}
+                  className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  loading="lazy"
+                />
+
+                {/* Gradient Overlay */}
+                <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}></div>
+
+                <div className={`absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}>
+                  <p className="text-white font-medium text-lg leading-tight">{item.caption}</p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default Gallery;
