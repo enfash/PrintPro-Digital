@@ -185,7 +185,7 @@ export default function RootLayout({
 }
 ` }} />
       </head>
-      <body className={cn("font-body antialiased", 'min-h-screen bg-slate-50 text-slate-900 selection:bg-primary-200 selection:text-primary-900')}>
+      <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", "font-body")}>
         {children}
         <Toaster />
       </body>
