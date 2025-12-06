@@ -1,8 +1,6 @@
-
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
-import { useFormState } from 'react-dom';
+import { useEffect, useRef, useState, useTransition, useActionState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { contactFormSchema, type ContactFormValues, categories } from '@/lib/schema';
@@ -19,7 +17,7 @@ import { Sparkles, Loader2, Upload, File as FileIcon, X } from 'lucide-react';
 const initialState: FormState = null;
 
 export default function Contact() {
-  const [formState, formAction] = useFormState(handleFormSubmission, initialState);
+  const [formState, formAction] = useActionState(handleFormSubmission, initialState);
   const [isAiPending, startAiTransition] = useTransition();
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
