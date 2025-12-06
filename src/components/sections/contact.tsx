@@ -1,209 +1,391 @@
 'use client';
 
-import { useEffect, useRef, useState, useTransition, useActionState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { contactFormSchema, type ContactFormValues, categories } from '@/lib/schema';
-import { getSuggestedReference, handleFormSubmission, type FormState } from '@/lib/actions';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState, useRef } from 'react';
+import { Loader2, Upload, X, MessageCircle, CheckCircle, AlertCircle, Phone, Mail, FileCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { useToast } from '@/hooks/use-toast';
-import { Sparkles, Loader2, Upload, File as FileIcon, X } from 'lucide-react';
+import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
+import TermsModal from '../modals/TermsModal';
+import { ContactFormData } from '@/lib/types';
+import Link from 'next/link';
 
-const initialState: FormState = null;
+const Contact: React.FC = () => {
+  const [formData, setFormData] = useState<ContactFormData>({
+    name: '',
+    phone: '',
+    email: '',
+    jobType: 'Flex Banner',
+    message: '',
+    file: null
+  });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [agreeToTerms, setAgreeToTerms] = useState(true); // Prechecked
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
-export default function Contact() {
-  const [formState, formAction] = useActionState(handleFormSubmission, initialState);
-  const [isAiPending, startAiTransition] = useTransition();
-  const { toast } = useToast();
-  const formRef = useRef<HTMLFormElement>(null);
+  // Ref to clear file input after submission
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const form = useForm<ContactFormValues>({
-    resolver: zodResolver(contactFormSchema),
-    defaultValues: {
-      customerName: '',
-      email: '',
-      category: undefined,
-      orderDescription: '',
-      additionalNotes: '',
-      suggestedReferenceName: '',
-      file: undefined,
-    },
-  });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  const { watch, setValue } = form;
-  const file = watch('file');
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const selectedFile = e.target.files[0];
+      const maxSize = 25 * 1024 * 1024; // 25MB in bytes
 
-  useEffect(() => {
-    if (formState?.message) {
-      if (formState.issues) {
-        toast({
-          title: 'Oops! Something went wrong.',
-          description: formState.message,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: 'Success!',
-          description: formState.message,
-        });
-        form.reset();
-        formRef.current?.reset();
+      if (selectedFile.size > maxSize) {
+        // File is too large
+        setStatus('error');
+        setErrorMessage(`File is too large (${(selectedFile.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 25MB. Please use WhatsApp to send larger files.`);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = ''; // Clear the input
+        }
+        return;
       }
+
+      setFormData(prev => ({ ...prev, file: selectedFile }));
     }
-  }, [formState, toast, form]);
+  };
 
-  const handleSuggestClick = () => {
-    startAiTransition(async () => {
-      const { customerName, orderDescription } = form.getValues();
-      const result = await getSuggestedReference({ customerName, orderDescription });
-      if (result.suggestion) {
-        form.setValue('suggestedReferenceName', result.suggestion);
-        toast({
-          title: 'Suggestion Ready!',
-          description: 'An AI-powered reference name has been generated for you.',
-        });
-      } else if (result.error) {
-        toast({
-          title: 'Suggestion Failed',
-          description: result.error,
-          variant: 'destructive',
-        });
+  const clearFile = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setFormData(prev => ({ ...prev, file: null }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!agreeToTerms) {
+      setErrorMessage('Please agree to the Terms of Service');
+      return;
+    }
+
+    setStatus('sending');
+    setErrorMessage('');
+
+    try {
+      const formDataToSend = new FormData();
+
+      // Form fields
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('jobType', formData.jobType);
+      formDataToSend.append('message', formData.message);
+      formDataToSend.append('agreeToUpdates', agreeToTerms.toString());
+
+      // File attachment
+      if (formData.file) {
+        formDataToSend.append('file', formData.file);
       }
-    });
+
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        body: formDataToSend,
+      });
+
+      let result;
+      try {
+        const text = await response.text();
+        try {
+          result = JSON.parse(text);
+        } catch (e) {
+          console.error('Non-JSON response:', text);
+          throw new Error(`Server Error (${response.status}): ${text.substring(0, 50)}...`);
+        }
+      } catch (e) {
+        throw e;
+      }
+
+      if (response.ok && result?.success) {
+        setStatus('success');
+        // Reset form
+        setFormData({ name: '', phone: '', email: '', jobType: 'Flex Banner', message: '', file: null });
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+
+        // Reset after 5 seconds
+        setTimeout(() => setStatus('idle'), 5000);
+      } else {
+        throw new Error(result?.error || result?.details || 'Failed to send message');
+      }
+    } catch (error) {
+      console.error('Submission error:', error);
+      setStatus('error');
+      setErrorMessage('Failed to send message. Please try WhatsApp instead.');
+      setTimeout(() => setStatus('idle'), 5000);
+    }
   };
 
   return (
-    <section id="contact" className="w-full py-12 md:py-24 lg:py-32 bg-primary-50">
-      <div className="container px-4 md:px-6">
-        <Card className="max-w-3xl mx-auto shadow-2xl">
-          <CardHeader>
-            <CardTitle className="text-3xl font-bold font-headline">Request a Quote</CardTitle>
-            <CardDescription>
-              Fill out the form below and we'll get back to you with a personalized quote as soon as possible.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form ref={formRef} action={formAction} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField control={form.control} name="customerName" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Your Name</FormLabel>
-                      <FormControl><Input placeholder="e.g., Tunde Adebayo" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                  <FormField control={form.control} name="email" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl><Input type="email" placeholder="you@example.com" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-                </div>
+    <section id="contact" className="py-16 lg:py-24 bg-white scroll-mt-16">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-2 gap-16">
 
-                <FormField control={form.control} name="category" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Service Category</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl><SelectTrigger><SelectValue placeholder="Select a service" /></SelectTrigger></FormControl>
-                      <SelectContent>
-                        {categories.map(cat => <SelectItem key={cat} value={cat}>{cat}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )} />
+          {/* Left Side: Info */}
+          <div>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
+                Start your order
+              </h2>
+              <p className="text-lg text-slate-600">
+                Send us your artwork and details. We will reply fast with a price.
+              </p>
+            </div>
 
-                <FormField control={form.control} name="orderDescription" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Order Description</FormLabel>
-                    <FormControl><Textarea placeholder="Describe your project, including dimensions, quantity, and materials if known." {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-                
-                <FormField control={form.control} name="additionalNotes" render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Additional Notes (Optional)</FormLabel>
-                    <FormControl><Textarea placeholder="Any other details? e.g., deadline, specific instructions..." {...field} /></FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )} />
-
-                <div className="space-y-2">
-                  <FormLabel>Artwork / File (Optional)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      className="hidden"
-                      ref={fileInputRef}
-                      onChange={(e) => setValue('file', e.target.files?.[0])}
-                      name="file"
-                    />
-                  </FormControl>
-                  {!file ? (
-                    <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()}>
-                      <Upload className="mr-2 h-4 w-4" />
-                      Upload File
-                    </Button>
-                  ) : (
-                    <div className="flex items-center justify-between rounded-md border border-input p-2">
-                      <div className="flex items-center gap-2">
-                        <FileIcon className="h-5 w-5 text-muted-foreground" />
-                        <span className="text-sm font-medium truncate max-w-xs">{file.name}</span>
-                      </div>
-                      <Button type="button" variant="ghost" size="icon" onClick={() => setValue('file', undefined)}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                  <p className="text-xs text-muted-foreground">Max file size: 10MB. Accepted formats: JPG, PNG, PDF, AI, PSD.</p>
-                  <FormMessage>{form.formState.errors.file?.message as string}</FormMessage>
-                </div>
-
-
-                <Card className="bg-muted/50">
-                  <CardContent className="pt-6">
-                    <div className="space-y-4">
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                        <div>
-                          <h4 className="font-semibold">AI Order Reference</h4>
-                          <p className="text-sm text-muted-foreground">Let our AI suggest a unique reference for your order files.</p>
-                        </div>
-                        <Button type="button" variant="secondary" onClick={handleSuggestClick} disabled={isAiPending}>
-                          {isAiPending ? (
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Sparkles className="mr-2 h-4 w-4 text-accent" />
-                          )}
-                          Suggest Reference
-                        </Button>
-                      </div>
-                       <FormField control={form.control} name="suggestedReferenceName" render={({ field }) => (
-                          <FormItem>
-                            <FormControl><Input placeholder="Suggestion will appear here..." {...field} disabled /></FormControl>
-                          </FormItem>
-                        )} />
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
-                  {form.formState.isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Submit Request
+            <div className="space-y-6">
+              <div>
+                <Button asChild size="lg" className="w-full sm:w-auto gap-2 !bg-green-600 hover:!bg-green-700">
+                  <Link href={WHATSAPP_LINK} target="_blank">
+                    <MessageCircle size={20} />
+                    Chat on WhatsApp
+                  </Link>
                 </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                <p className="text-xs text-slate-500 mt-2 text-center sm:text-left">Available 9am–6pm, Mon–Sat</p>
+              </div>
+
+              <div className="pt-6 border-t border-slate-100 space-y-4">
+                <div className="flex items-center gap-4 text-slate-700">
+                  <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-primary-600">
+                    <Phone size={20} />
+                  </div>
+                  <span className="font-medium">{PHONE_DISPLAY}</span>
+                </div>
+                <div className="flex items-center gap-4 text-slate-700">
+                  <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-primary-600">
+                    <Mail size={20} />
+                  </div>
+                  <a href={`mailto:${EMAIL_DISPLAY}`} className="font-medium hover:text-primary-600 transition-colors">
+                    {EMAIL_DISPLAY}
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side: Form */}
+          <div className="bg-slate-50 rounded-3xl p-8 lg:p-10 border border-slate-100 shadow-sm relative overflow-hidden">
+
+            {/* Success Overlay */}
+            {status === 'success' && (
+              <div className="absolute inset-0 bg-slate-50 flex flex-col items-center justify-center text-center p-8 z-20 animate-bounce-in">
+                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
+                  <CheckCircle size={32} />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Sent!</h3>
+                <p className="text-slate-600 mb-6">
+                  We have received your details. Our team will review and send you a price shortly.
+                </p>
+                <Button
+                  onClick={() => setStatus('idle')}
+                  variant="outline"
+                >
+                  Send another request
+                </Button>
+              </div>
+            )}
+
+            {/* Error Overlay */}
+            {status === 'error' && (
+              <div className="absolute inset-0 bg-white/95 flex flex-col items-center justify-center text-center p-8 z-20 animate-bounce-in">
+                <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mb-6">
+                  <AlertCircle size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Something went wrong</h3>
+                <p className="text-slate-600 mb-6 max-w-xs mx-auto">
+                  {errorMessage || 'Unable to send your request at this time.'}
+                </p>
+                <div className="flex gap-3">
+                  <Button onClick={() => setStatus('idle')} variant="secondary">
+                    Try Again
+                  </Button>
+                   <Button asChild variant="default" className="!bg-green-600 hover:!bg-green-700">
+                    <Link href={WHATSAPP_LINK} target="_blank">
+                      Use WhatsApp
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-sm font-medium text-slate-700">Name <span className="text-red-500">*</span></label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="phone" className="text-sm font-medium text-slate-700">Phone <span className="text-red-500">*</span></label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    required
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                    placeholder="080..."
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium text-slate-700">Email (Optional)</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                  placeholder="john@example.com"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="jobType" className="text-sm font-medium text-slate-700">Job Type <span className="text-red-500">*</span></label>
+                <select
+                  id="jobType"
+                  name="jobType"
+                  required
+                  value={formData.jobType}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                >
+                  <option value="Flex Banner">Flex Banner</option>
+                  <option value="Self-Adhesive Vinyl (SAV)">Self-Adhesive Vinyl (SAV)</option>
+                  <option value="Window / Clear Sticker">Window / Clear Sticker</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="message" className="text-sm font-medium text-slate-700">Message <span className="text-red-500">*</span></label>
+                <textarea
+                  id="message"
+                  name="message"
+                  required
+                  rows={4}
+                  value={formData.message}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none"
+                  placeholder="Size, quantity, deadline, any notes..."
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="file" className="text-sm font-medium text-slate-700">Upload artwork (Optional)</label>
+                <div className="relative group">
+                  <input
+                    type="file"
+                    id="file"
+                    name="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="file"
+                    className={`flex items-center justify-center w-full px-4 py-4 border-2 border-dashed rounded-xl cursor-pointer bg-white transition-all ${formData.file
+                      ? 'border-primary-500 bg-primary-50/50 text-primary-700'
+                      : 'border-slate-300 text-slate-500 hover:border-primary-400 hover:bg-slate-50'
+                      }`}
+                  >
+                    {formData.file ? (
+                      <div className="flex items-center w-full justify-between">
+                        <div className="flex items-center overflow-hidden">
+                          <FileCheck className="mr-2 h-5 w-5 flex-shrink-0" />
+                          <span className="truncate font-medium">{formData.file.name}</span>
+                          <span className="ml-2 text-xs opacity-70 flex-shrink-0">
+                            ({(formData.file.size / 1024 / 1024).toFixed(2)} MB)
+                          </span>
+                        </div>
+                        <button
+                          onClick={clearFile}
+                          className="p-1 hover:bg-white rounded-full transition-colors ml-2"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <Upload className="mr-2 h-5 w-5" />
+                        <span className="truncate">Choose a file to upload</span>
+                      </>
+                    )}
+                  </label>
+                </div>
+              </div>
+
+              {/* Terms Acknowledgment - Single prechecked checkbox */}
+              <div className="flex items-start gap-3 pt-4 pb-2 border-t border-slate-200">
+                <div className="flex h-6 items-center">
+                  <input
+                    id="agreeToTerms"
+                    name="agreeToTerms"
+                    type="checkbox"
+                    checked={agreeToTerms}
+                    onChange={(e) => setAgreeToTerms(e.target.checked)}
+                    required
+                    className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-600 cursor-pointer"
+                  />
+                </div>
+                <div className="text-sm leading-6">
+                  <label htmlFor="agreeToTerms" className="text-slate-600 cursor-pointer select-none">
+                    By submitting artwork, you agree to BOMedia's{' '}
+                    <button
+                      type="button"
+                      onClick={() => setShowTermsModal(true)}
+                      className="text-primary-700 hover:text-primary-800 underline font-medium"
+                    >
+                      Terms of Service
+                    </button>.
+                  </label>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                variant="default"
+                size="lg"
+                className="w-full"
+                disabled={status === 'sending'}
+              >
+                {status === 'sending' ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Sending...
+                  </div>
+                ) : (
+                  'Get Price'
+                )}
+              </Button>
+            </form>
+          </div>
+        </div>
       </div>
+
+      {/* Terms Modal */}
+      <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
     </section>
   );
-}
+};
+
+export default Contact;
+
+    
