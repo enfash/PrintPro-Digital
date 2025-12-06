@@ -29,7 +29,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 z-50">
           <img
-            src="/bomedia-logo.svg"
+            src="/logos/bomedia-logo.svg"
             alt="BOMedia"
             className="h-12 w-auto"
           />
