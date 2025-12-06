@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Facebook, Instagram, Mail, MapPin, Printer } from 'lucide-react';
 import Link from 'next/link';
@@ -7,7 +6,7 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-neutral-850 text-slate-400 py-12 border-t border-slate-800">
+    <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
       <div className="container">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
@@ -15,9 +14,10 @@ const Footer: React.FC = () => {
           <div className="text-center md:text-left">
              <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
               <Printer className="h-8 w-8 text-primary-500" />
-              <h3 className="text-xl font-bold text-white">PrintPro Digital</h3>
+              <h3 className="text-xl font-bold text-white">BOMedia</h3>
             </div>
             <p className="text-sm">Large-format printing for Lagos businesses.</p>
+            <p className="text-xs text-slate-500 mt-2">BN7243402</p>
           </div>
 
           {/* Service Areas */}
@@ -52,11 +52,11 @@ const Footer: React.FC = () => {
                 Instagram
               </a>
               <a
-                href="mailto:info@printpro.ng"
+                href="mailto:info@bomedia.ng"
                 className="flex items-center justify-center md:justify-start gap-2 hover:text-white transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                info@printpro.ng
+                info@bomedia.ng
               </a>
               <div className="flex items-center justify-center md:justify-start gap-2">
                 <MapPin className="w-4 h-4" />
@@ -78,7 +78,7 @@ const Footer: React.FC = () => {
 
         {/* Copyright */}
         <div className="border-t border-slate-800 pt-6 text-center text-sm">
-          &copy; {currentYear} PrintPro Digital. All rights reserved.
+          &copy; {currentYear} BOMedia. All rights reserved.
         </div>
       </div>
     </footer>
