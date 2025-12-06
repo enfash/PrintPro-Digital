@@ -4,8 +4,8 @@ import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'PrintPro Digital - Large Format Printing in Lagos',
-  description: 'High-quality large format printing services in Lagos, Nigeria. From flex banners to custom graphics, we bring your vision to life.',
+  title: 'BOMedia - Large Format Printing in Lagos',
+  description: 'Large-format printing services in Lagos focusing on Flex banners, SAV, and Window graphics.',
 };
 
 export default function RootLayout({
