@@ -8,11 +8,6 @@ import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
 import { ContactFormData } from '@/lib/types';
 import Link from 'next/link';
-import { db, storage } from '@/lib/firebase';
-import { addDoc, collection } from 'firebase/firestore';
-import { ref, uploadBytes } from 'firebase/storage';
-import { errorEmitter } from '@/firebase/error-emitter';
-import { FirestorePermissionError } from '@/firebase/errors';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState<ContactFormData>({
@@ -73,43 +68,8 @@ const Contact: React.FC = () => {
 
     setStatus('sending');
     setErrorMessage('');
-
-    // Prepare data for Firestore and email
-    const submissionData = {
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email,
-      jobType: formData.jobType,
-      message: formData.message,
-      fileName: formData.file?.name || 'N/A',
-      fileSize: formData.file?.size || 0,
-      submittedAt: new Date(),
-    };
-
-    // We will attempt both Firestore write and email sending
-    // 1. Add form data to Firestore
-    addDoc(collection(db, 'submissions'), submissionData)
-      .then(docRef => {
-        console.log("Document written with ID: ", docRef.id);
-        // Continue to file upload and email sending even if firestore write succeeds
-      })
-      .catch(async (serverError) => {
-        const permissionError = new FirestorePermissionError({
-          path: 'submissions',
-          operation: 'create',
-          requestResourceData: submissionData,
-        });
-        errorEmitter.emit('permission-error', permissionError);
-        // We can still try to send the email
-      });
-
-    // 2. Upload file to Firebase Storage if it exists
-    if (formData.file) {
-      const fileRef = ref(storage, `uploads/${Date.now()}_${formData.file.name}`);
-      await uploadBytes(fileRef, formData.file).catch(err => console.error("File upload failed:", err));
-    }
     
-    // 3. Use the existing API route to send emails
+    // Use the API route to handle Firestore write, file upload, and email sending
     const formDataForApi = new FormData();
     formDataForApi.append('name', formData.name);
     formDataForApi.append('phone', formData.phone);
@@ -129,7 +89,7 @@ const Contact: React.FC = () => {
         const result = await response.json();
 
         if (!response.ok || !result.success) {
-            throw new Error(result.details || 'Failed to send email.');
+            throw new Error(result.error || 'An unknown error occurred.');
         }
 
         setStatus('success');
@@ -137,22 +97,17 @@ const Contact: React.FC = () => {
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
-        setTimeout(() => setStatus('idle'), 5000);
 
     } catch (error) {
-        console.error('Email sending error:', error);
+        console.error('Submission error:', error);
         setStatus('error');
-        let message = 'Failed to send message. Please try WhatsApp instead.';
+        let message = 'Failed to send your message. Please try WhatsApp instead.';
         if (error instanceof Error) {
             message = error.message;
         }
         setErrorMessage(message);
-        setTimeout(() => setStatus('idle'), 5000);
     }
   };
-
-  // Alias for getFirebase, required by errors.ts
-  const getFirebase = () => require('@/lib/firebase').default;
 
 
   return (
