@@ -16,7 +16,7 @@ export default function Hero() {
           </p>
         </div>
         <div className="mt-6 animate-in fade-in-5 slide-in-from-bottom-6 duration-500 delay-200">
-          <Button asChild size="lg" className="font-semibold shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-shadow">
+          <Button asChild size="lg" className="font-semibold" variant="primary">
             <Link href="#contact">Get Your Free Quote</Link>
           </Button>
         </div>

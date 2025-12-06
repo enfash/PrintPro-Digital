@@ -4,17 +4,17 @@ import { Layers, Monitor, Palmtree } from 'lucide-react';
 
 const services = [
   {
-    icon: <Layers className="h-8 w-8 text-primary" />,
+    icon: <Layers className="h-8 w-8 text-primary-600" />,
     title: 'Flex & SAV Banners',
     description: 'Durable, high-resolution flex and self-adhesive vinyl (SAV) banners for indoor and outdoor advertising.',
   },
   {
-    icon: <Monitor className="h-8 w-8 text-primary" />,
+    icon: <Monitor className="h-8 w-8 text-primary-600" />,
     title: 'Window Graphics',
     description: 'Transform your storefront with custom window decals and graphics that attract customers and enhance your brand.',
   },
   {
-    icon: <Palmtree className="h-8 w-8 text-primary" />,
+    icon: <Palmtree className="h-8 w-8 text-primary-600" />,
     title: '3D Signage & Lettering',
     description: 'Make a bold statement with custom 3D signs and lettering that add depth and professionalism to your space.',
   },
