@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useRef } from 'react';
@@ -10,6 +11,8 @@ import Link from 'next/link';
 import { db, storage } from '@/lib/firebase';
 import { addDoc, collection } from 'firebase/firestore';
 import { ref, uploadBytes } from 'firebase/storage';
+import { errorEmitter } from '@/firebase/error-emitter';
+import { FirestorePermissionError } from '@/firebase/errors';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState<ContactFormData>({
@@ -71,59 +74,86 @@ const Contact: React.FC = () => {
     setStatus('sending');
     setErrorMessage('');
 
-    try {
-      // 1. Upload file to Firebase Storage if it exists
-      let fileUrl = '';
-      if (formData.file) {
-        const fileRef = ref(storage, `uploads/${Date.now()}_${formData.file.name}`);
-        await uploadBytes(fileRef, formData.file);
-        // In a real app, you'd get the download URL here.
-        // For this prototype, we'll just log that it was uploaded.
-        console.log('File uploaded:', formData.file.name);
-      }
-      
-      // 2. Add form data to Firestore
-      const docRef = await addDoc(collection(db, 'submissions'), {
-        name: formData.name,
-        phone: formData.phone,
-        email: formData.email,
-        jobType: formData.jobType,
-        message: formData.message,
-        fileName: formData.file?.name || 'N/A',
-        submittedAt: new Date(),
+    // Prepare data for Firestore and email
+    const submissionData = {
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      jobType: formData.jobType,
+      message: formData.message,
+      fileName: formData.file?.name || 'N/A',
+      fileSize: formData.file?.size || 0,
+      submittedAt: new Date(),
+    };
+
+    // We will attempt both Firestore write and email sending
+    // 1. Add form data to Firestore
+    addDoc(collection(db, 'submissions'), submissionData)
+      .then(docRef => {
+        console.log("Document written with ID: ", docRef.id);
+        // Continue to file upload and email sending even if firestore write succeeds
+      })
+      .catch(async (serverError) => {
+        const permissionError = new FirestorePermissionError({
+          path: 'submissions',
+          operation: 'create',
+          requestResourceData: submissionData,
+        });
+        errorEmitter.emit('permission-error', permissionError);
+        // We can still try to send the email
       });
 
-      console.log("Document written with ID: ", docRef.id);
+    // 2. Upload file to Firebase Storage if it exists
+    if (formData.file) {
+      const fileRef = ref(storage, `uploads/${Date.now()}_${formData.file.name}`);
+      await uploadBytes(fileRef, formData.file).catch(err => console.error("File upload failed:", err));
+    }
+    
+    // 3. Use the existing API route to send emails
+    const formDataForApi = new FormData();
+    formDataForApi.append('name', formData.name);
+    formDataForApi.append('phone', formData.phone);
+    formDataForApi.append('email', formData.email);
+    formDataForApi.append('jobType', formData.jobType);
+    formDataForApi.append('message', formData.message);
+    if (formData.file) {
+      formDataForApi.append('file', formData.file);
+    }
+    
+    try {
+        const response = await fetch('/api/contact', {
+            method: 'POST',
+            body: formDataForApi,
+        });
 
-      // 3. Use the existing API route to send emails (or move logic here if preferred)
-      const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
-      formDataToSend.append('phone', formData.phone);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('jobType', formData.jobType);
-      formDataToSend.append('message', formData.message);
-      
-      setStatus('success');
-      // Reset form
-      setFormData({ name: '', phone: '', email: '', jobType: 'Flex Banner', message: '', file: null });
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+        const result = await response.json();
 
-      // Reset after 5 seconds
-      setTimeout(() => setStatus('idle'), 5000);
-      
+        if (!response.ok || !result.success) {
+            throw new Error(result.details || 'Failed to send email.');
+        }
+
+        setStatus('success');
+        setFormData({ name: '', phone: '', email: '', jobType: 'Flex Banner', message: '', file: null });
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        setTimeout(() => setStatus('idle'), 5000);
+
     } catch (error) {
-      console.error('Submission error:', error);
-      setStatus('error');
-      let message = 'Failed to send message. Please try WhatsApp instead.';
-      if (error instanceof Error) {
-        message = error.message;
-      }
-      setErrorMessage(message);
-      setTimeout(() => setStatus('idle'), 5000);
+        console.error('Email sending error:', error);
+        setStatus('error');
+        let message = 'Failed to send message. Please try WhatsApp instead.';
+        if (error instanceof Error) {
+            message = error.message;
+        }
+        setErrorMessage(message);
+        setTimeout(() => setStatus('idle'), 5000);
     }
   };
+
+  // Alias for getFirebase, required by errors.ts
+  const getFirebase = () => require('@/lib/firebase').default;
+
 
   return (
     <section id="contact" className="py-16 lg:py-24 bg-white scroll-mt-16">
@@ -389,4 +419,3 @@ const Contact: React.FC = () => {
 };
 
 export default Contact;
-    

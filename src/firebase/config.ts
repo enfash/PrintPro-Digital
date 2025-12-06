@@ -12,18 +12,9 @@ const firebaseConfig = {
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase only if it hasn't been initialized yet
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+// Initialize Firebase
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-// Initialize Firestore and Storage
-export const db = getFirestore(app);
-export const storage = getStorage(app);
-
-export default app;
-
-// This is a simplified and potentially problematic way to get the app instance.
-// It's here to satisfy the dependency in errors.ts for now.
-// A proper solution would involve a shared context or singleton.
-export const getFirebase = () => {
-  return app;
-};
+export { app, db, storage };

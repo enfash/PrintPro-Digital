@@ -3,6 +3,7 @@ import type {Metadata} from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 export const metadata: Metadata = {
   title: 'Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia',
@@ -187,6 +188,7 @@ export default function RootLayout({
 ` }} />
       </head>
       <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", "font-body")} suppressHydrationWarning>
+        <FirebaseErrorListener />
         {children}
         <Toaster />
       </body>
