@@ -185,7 +185,7 @@ export default function RootLayout({
 }
 ` }} />
       </head>
-      <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", "font-body")}>
+      <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", "font-body")} suppressHydrationWarning>
         {children}
         <Toaster />
       </body>
