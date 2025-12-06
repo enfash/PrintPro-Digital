@@ -2,10 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-
-const WHATSAPP_NUMBER = "2348012345678";
-const GREETING_MESSAGE = "Hello PrintPro Digital, I'm interested in your printing services.";
-const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(GREETING_MESSAGE)}`;
+import { WHATSAPP_LINK } from '@/lib/constants';
 
 const WhatsAppFloat: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
