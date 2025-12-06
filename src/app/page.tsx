@@ -4,6 +4,7 @@ import Hero from '@/components/sections/hero';
 import Services from '@/components/sections/services';
 import Gallery from '@/components/sections/gallery';
 import Testimonials from '@/components/sections/testimonials';
+import FAQ from '@/components/sections/faq';
 import Contact from '@/components/sections/contact';
 import WhatsAppFloat from '@/components/ui/whatsapp-float';
 
@@ -16,6 +17,7 @@ export default function Home() {
         <Services />
         <Gallery />
         <Testimonials />
+        <FAQ />
         <Contact />
       </main>
       <Footer />
