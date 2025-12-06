@@ -7,10 +7,10 @@ import { Menu, X, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const navLinks = [
-  { href: '#services', label: 'Services' },
-  { href: '#gallery', label: 'Our Work' },
-  { href: '#testimonials', label: 'Testimonials' },
-  { href: '#contact', label: 'Contact Us' },
+  { href: '/#services', label: 'Services' },
+  { href: '/#gallery', label: 'Our Work' },
+  { href: '/#testimonials', label: 'Testimonials' },
+  { href: '/#contact', label: 'Contact Us' },
 ];
 
 export default function Header() {
@@ -32,7 +32,7 @@ export default function Header() {
         </nav>
         <div className="flex flex-1 items-center justify-end gap-2">
           <Button asChild className="hidden md:flex" variant="outline">
-            <Link href="#contact">Get a Quote</Link>
+            <Link href="/#contact">Get a Quote</Link>
           </Button>
           <Button variant="ghost" className="md:hidden" onClick={() => setIsOpen(!isOpen)} size="icon">
             {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -49,7 +49,7 @@ export default function Header() {
               </Link>
             ))}
             <Button asChild className="mt-2" variant="outline">
-              <Link href="#contact" onClick={() => setIsOpen(false)}>Get a Quote</Link>
+              <Link href="/#contact" onClick={() => setIsOpen(false)}>Get a Quote</Link>
             </Button>
           </div>
         </div>
