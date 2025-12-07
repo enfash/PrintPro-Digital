@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb, adminStorage } from '@/lib/firebaseAdmin';
 import { resend, RESEND_FROM_EMAIL, RESEND_TO_EMAIL } from '@/lib/resend';
 import { generateAdminEmailHTML, generateCustomerEmailHTML } from '@/lib/email-template';
 
@@ -8,17 +7,11 @@ export const runtime = 'nodejs';
 // Centralized error handler
 function handleError(error: any, message: string, status: number = 500) {
     console.error(`❌ API Error: ${message}`, error);
-    // In development, you might want to send back the full error
     const errorMessage = error.message || 'An unexpected error occurred.';
     return NextResponse.json({ success: false, error: `${message}: ${errorMessage}` }, { status });
 }
 
 export async function POST(request: NextRequest) {
-    
-    if (!adminDb || !adminStorage) {
-        return handleError(new Error('Firebase Admin not initialized. Check server logs for details.'), 'Server configuration error');
-    }
-
     const formData = await request.formData();
 
     // --- 1. Extract and Validate Data ---
@@ -36,63 +29,19 @@ export async function POST(request: NextRequest) {
             { status: 400 }
         );
     }
-
-    let fileUrl: string | null = null;
+    
+    const refId = Math.random().toString(36).substring(2, 7).toUpperCase();
     let fileName: string | null = null;
     let fileSize: number | null = null;
     let fileBuffer: Buffer | null = null;
 
-    // --- 2. Handle File Upload ---
     if (file) {
-        try {
-            fileName = file.name;
-            fileSize = file.size;
-            const arrayBuffer = await file.arrayBuffer();
-            fileBuffer = Buffer.from(arrayBuffer);
-            
-            const bucket = adminStorage.bucket();
-            const timestamp = Date.now();
-            const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9.-]/g, '_');
-            const storagePath = `submissions/${timestamp}_${sanitizedFileName}`;
-            const fileUpload = bucket.file(storagePath);
-
-            await fileUpload.save(fileBuffer, {
-                metadata: { contentType: file.type },
-            });
-
-            const [signedUrl] = await fileUpload.getSignedUrl({
-                action: 'read',
-                expires: '01-01-2030', // Long-lived URL
-            });
-            fileUrl = signedUrl;
-
-        } catch (uploadError: any) {
-            return handleError(uploadError, 'Failed to upload file');
-        }
+        fileName = file.name;
+        fileSize = file.size;
+        const arrayBuffer = await file.arrayBuffer();
+        fileBuffer = Buffer.from(arrayBuffer);
     }
 
-    // --- 3. Save to Firestore ---
-    const refId = Math.random().toString(36).substring(2, 7).toUpperCase();
-    const submissionData = {
-        refId,
-        name,
-        phone,
-        email,
-        jobType,
-        message,
-        agreeToUpdates,
-        fileUrl,
-        fileName,
-        fileSize,
-        createdAt: new Date().toISOString(),
-        status: 'new',
-    };
-
-    try {
-        await adminDb.collection('submissions').add(submissionData);
-    } catch (dbError: any) {
-        return handleError(dbError, 'Failed to save submission');
-    }
 
     // --- 4. Send Emails (with graceful failure) ---
     try {
