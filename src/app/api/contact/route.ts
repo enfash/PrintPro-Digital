@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { adminDb, adminStorage } from '@/lib/firebaseAdmin';
 import { resend, RESEND_FROM_EMAIL, RESEND_TO_EMAIL } from '@/lib/resend';
 import { generateAdminEmailHTML, generateCustomerEmailHTML } from '@/lib/email-template';
 
@@ -31,6 +32,7 @@ export async function POST(request: NextRequest) {
     }
     
     const refId = Math.random().toString(36).substring(2, 7).toUpperCase();
+    let fileUrl: string | null = null;
     let fileName: string | null = null;
     let fileSize: number | null = null;
     let fileBuffer: Buffer | null = null;
@@ -41,7 +43,47 @@ export async function POST(request: NextRequest) {
         const arrayBuffer = await file.arrayBuffer();
         fileBuffer = Buffer.from(arrayBuffer);
     }
+    
 
+    // --- 2. Upload File to Firebase Storage (if it exists) ---
+    if (fileBuffer && fileName) {
+        try {
+            const bucket = adminStorage.bucket();
+            const filePath = `submissions/${refId}/${fileName}`;
+            const fileRef = bucket.file(filePath);
+
+            await fileRef.save(fileBuffer, {
+                metadata: { contentType: file.type },
+            });
+            
+            // Make the file public and get the URL
+            await fileRef.makePublic();
+            fileUrl = fileRef.publicUrl();
+
+        } catch (storageError) {
+            return handleError(storageError, 'Failed to upload file');
+        }
+    }
+
+    // --- 3. Save Submission to Firestore ---
+    try {
+        const submissionData = {
+            refId,
+            name,
+            phone,
+            email,
+            jobType,
+            message,
+            fileUrl,
+            fileName,
+            fileSize,
+            agreeToUpdates,
+            submittedAt: new Date().toISOString(),
+        };
+        await adminDb.collection('submissions').add(submissionData);
+    } catch (firestoreError) => {
+        return handleError(firestoreError, 'Failed to save submission');
+    }
 
     // --- 4. Send Emails (with graceful failure) ---
     try {
@@ -69,7 +111,7 @@ export async function POST(request: NextRequest) {
             await resend.emails.send({
                 from: RESEND_FROM_EMAIL,
                 to: email,
-                subject: `Order Received [#${refId}] - BOMedia`,
+                subject: `Order Received [#${refId}] - PrintPro Digital`,
                 html: customerEmailHTML,
             });
         }
