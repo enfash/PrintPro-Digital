@@ -68,7 +68,7 @@ const Header: React.FC = () => {
           isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex flex-col gap-6 text-lg font-medium">
+        <div className="flex flex-col gap-6 text-lg font-medium bg-white">
           {NAV_LINKS.map((link) => (
             <Link
               key={link.label}
