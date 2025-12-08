@@ -80,7 +80,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Legal Links */}
-          <div className="text-center md-text-left">
+          <div className="text-center md:text-left">
             <h4 className="text-white font-semibold mb-3">Legal</h4>
             <div className="space-y-2 text-sm">
               <Link href="/privacy-policy" className="block hover:text-white transition-colors">Privacy Policy</Link>
