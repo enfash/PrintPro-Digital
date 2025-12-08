@@ -1,48 +1,16 @@
 
+
 import * as admin from 'firebase-admin';
 
-let adminDb: admin.firestore.Firestore | null = null;
-let adminStorage: admin.storage.Storage | null = null;
-let adminApp: admin.app.App | null = null;
+// This file is now deprecated. The initialization logic has been moved
+// directly into the server action that needs it (`src/lib/actions.ts`).
+// This ensures services are initialized on-demand with the correct
+// production environment variables.
 
-const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+// We export null values to prevent other parts of the app from
+// attempting to use a stale or non-existent admin instance.
+export const adminDb: admin.firestore.Firestore | null = null;
+export const adminStorage: admin.storage.Storage | null = null;
+export const adminApp: admin.app.App | null = null;
 
-const isConfigured =
-  process.env.FIREBASE_PROJECT_ID &&
-  privateKey &&
-  process.env.FIREBASE_CLIENT_EMAIL &&
-  process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-
-if (isConfigured && !admin.apps.length) {
-  try {
-    const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
-
-    adminApp = admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId: process.env.FIREBASE_PROJECT_ID,
-        privateKey: privateKey,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      }),
-      storageBucket: bucketName,
-    });
-
-    adminDb = admin.firestore();
-    adminStorage = admin.storage();
-    console.log('✅ Firebase Admin SDK initialized successfully.');
-
-  } catch (e: any) {
-    console.error('❌ Failed to initialize Firebase Admin SDK:', e.message);
-  }
-} else if (!admin.apps.length) {
-  console.warn(
-    '⚠️ Firebase Admin environment variables are not set. Server-side Firebase features will be disabled.'
-  );
-} else {
-    adminApp = admin.apps[0];
-    if (adminApp) {
-        adminDb = admin.firestore(adminApp);
-        adminStorage = admin.storage(adminApp);
-    }
-}
-
-export { adminDb, adminStorage, adminApp };
+console.warn("`src/lib/firebaseAdmin.ts` is deprecated. Admin services are now initialized on-demand within server actions.");

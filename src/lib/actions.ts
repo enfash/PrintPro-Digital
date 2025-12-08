@@ -1,11 +1,57 @@
 
 'use server';
 
-import { adminDb, adminStorage } from '@/lib/firebaseAdmin';
-import { resend, RESEND_FROM_EMAIL, RESEND_TO_EMAIL } from '@/lib/resend';
+import { initializeApp, getApps, cert, App } from 'firebase-admin/app';
+import { getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
+import { Resend } from 'resend';
 import { generateAdminEmailHTML, generateCustomerEmailHTML } from '@/lib/email-template';
 import { ContactFormSchema } from '@/lib/schema';
-import { z } from 'zod';
+
+// This state is shared across all invocations of the action
+let adminApp: App | null = null;
+let resend: Resend | null = null;
+
+function initializeServices() {
+  if (!resend) {
+    if (process.env.RESEND_API_KEY) {
+      resend = new Resend(process.env.RESEND_API_KEY);
+    } else {
+      console.warn("RESEND_API_KEY is not set. Email sending will be disabled.");
+    }
+  }
+
+  if (adminApp) {
+    return;
+  }
+  
+  const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  const isConfigured =
+    process.env.FIREBASE_PROJECT_ID &&
+    privateKey &&
+    process.env.FIREBASE_CLIENT_EMAIL;
+
+  if (isConfigured && !getApps().length) {
+    try {
+      adminApp = initializeApp({
+        credential: cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          privateKey: privateKey,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        }),
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      });
+      console.log('✅ Firebase Admin SDK initialized on-demand.');
+    } catch (e: any) {
+      console.error('❌ Failed to initialize Firebase Admin SDK:', e.message);
+      adminApp = null; // Ensure it's null on failure
+    }
+  } else if (getApps().length) {
+    adminApp = getApps()[0];
+  } else {
+    console.warn('⚠️ Firebase Admin environment variables are not fully set. Server-side Firebase features may be disabled.');
+  }
+}
 
 type ContactFormState = {
   success: boolean;
@@ -28,12 +74,13 @@ function getJobTypeFolder(jobType: string): string {
   }
 }
 
-
 export async function submitContactForm(
   prevState: ContactFormState,
   formData: FormData
 ): Promise<ContactFormState> {
   
+  initializeServices();
+
   const validatedFields = ContactFormSchema.safeParse({
     name: formData.get('name'),
     phone: formData.get('phone'),
@@ -66,14 +113,14 @@ export async function submitContactForm(
     const arrayBuffer = await file.arrayBuffer();
     fileBuffer = Buffer.from(arrayBuffer);
 
-    // --- Upload File to Firebase Storage ---
-    if (!adminStorage) {
-      console.error('Firebase Admin Storage is not initialized.');
+    if (!adminApp) {
+      console.error('Firebase Admin is not initialized. Cannot upload file.');
       return { success: false, message: 'Server configuration error: Storage service unavailable.' };
     }
 
     try {
-      const bucket = adminStorage.bucket();
+      const storage = getStorage(adminApp);
+      const bucket = storage.bucket();
       const jobTypeFolder = getJobTypeFolder(jobType);
       const filePath = `submissions/${jobTypeFolder}/${refId}-${fileName}`;
       const fileRef = bucket.file(filePath);
@@ -87,69 +134,58 @@ export async function submitContactForm(
 
     } catch (storageError: any) {
       console.error(`❌ Failed to upload file:`, storageError);
-      return { success: false, message: `Failed to upload file: ${storageError.message}` };
+      return { success: false, message: `Failed to upload file. Please try again.` };
     }
   }
 
-  // --- Save Submission to Firestore ---
-  if (!adminDb) {
-    console.error('Firebase Admin Firestore is not initialized.');
-    return { success: false, message: 'Server configuration error: Database service unavailable.' };
+  if (adminApp) {
+    try {
+      const db = getFirestore(adminApp);
+      const submissionData = {
+        refId, name, phone,
+        email: email || '',
+        jobType, message, fileUrl, fileName, fileSize,
+        agreeToUpdates: validatedFields.data.agreeToTerms,
+        submittedAt: new Date().toISOString(),
+      };
+      await db.collection('submissions').doc(refId).set(submissionData);
+    } catch (firestoreError: any) {
+      console.error(`❌ Failed to save submission:`, firestoreError);
+      return { success: false, message: `Failed to save your request. Please try again.` };
+    }
   }
 
-  try {
-    const submissionData = {
-      refId,
-      name,
-      phone,
-      email: email || '',
-      jobType,
-      message,
-      fileUrl,
-      fileName,
-      fileSize,
-      agreeToUpdates: validatedFields.data.agreeToTerms,
-      submittedAt: new Date().toISOString(),
-    };
-    await adminDb.collection('submissions').doc(refId).set(submissionData);
-  } catch (firestoreError: any) {
-    console.error(`❌ Failed to save submission:`, firestoreError);
-    return { success: false, message: `Failed to save submission: ${firestoreError.message}` };
-  }
-
-  // --- Send Emails ---
-  try {
-    const adminEmailHTML = generateAdminEmailHTML({
-      name, phone, email, jobType, message,
-      fileName: fileName || undefined,
-      fileSize: fileSize || undefined,
-      agreeToUpdates: validatedFields.data.agreeToTerms,
-    });
-
-    const attachments = fileBuffer && fileName
-      ? [{ filename: fileName, content: fileBuffer }]
-      : [];
-
-    await resend.emails.send({
-      from: RESEND_FROM_EMAIL,
-      to: RESEND_TO_EMAIL,
-      subject: `[#${refId}] New Order: ${jobType} - ${name}`,
-      html: adminEmailHTML,
-      attachments,
-    });
-
-    if (email) {
-      const customerEmailHTML = generateCustomerEmailHTML(name, jobType);
-      await resend.emails.send({
-        from: RESEND_FROM_EMAIL,
-        to: email,
-        subject: `Order Received [#${refId}] - BOMedia`,
-        html: customerEmailHTML,
+  if (resend && process.env.RESEND_FROM_EMAIL && process.env.RESEND_TO_EMAIL) {
+    try {
+      const adminEmailHTML = generateAdminEmailHTML({
+        name, phone, email, jobType, message,
+        fileName: fileName || undefined,
+        fileSize: fileSize || undefined,
+        agreeToUpdates: validatedFields.data.agreeToTerms,
       });
+
+      const attachments = fileBuffer && fileName ? [{ filename: fileName, content: fileBuffer }] : [];
+
+      await resend.emails.send({
+        from: process.env.RESEND_FROM_EMAIL,
+        to: process.env.RESEND_TO_EMAIL,
+        subject: `[#${refId}] New Order: ${jobType} - ${name}`,
+        html: adminEmailHTML,
+        attachments,
+      });
+
+      if (email) {
+        const customerEmailHTML = generateCustomerEmailHTML(name, jobType);
+        await resend.emails.send({
+          from: process.env.RESEND_FROM_EMAIL,
+          to: email,
+          subject: `Order Received [#${refId}] - BOMedia`,
+          html: customerEmailHTML,
+        });
+      }
+    } catch (emailError: any) {
+      console.warn('⚠️ Submission saved, but email sending failed.', emailError);
     }
-  } catch (emailError: any) {
-    console.warn('⚠️ Submission saved, but email sending failed.', emailError);
-    // Don't block the success response if emails fail, just log it.
   }
 
   return { success: true, message: 'Order received successfully!' };
