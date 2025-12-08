@@ -107,6 +107,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
       });
       // Do not reset form here, the success UI is shown instead
     } else if (state.message && !state.success) {
+      // This will now only show for server-side errors, not validation errors.
       toast({
         variant: 'destructive',
         title: 'Submission Failed',
@@ -118,22 +119,31 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
+      const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
-      if (selectedFile.size > 25 * 1024 * 1024) {
-          toast({
-              variant: "destructive",
-              title: "File too large",
-              description: "Max file size is 25MB.",
-          });
-          return;
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        toast({
+          variant: "destructive",
+          title: "File too large",
+          description: `The maximum file size is 25MB. Your file is ${(selectedFile.size / 1024 / 1024).toFixed(2)}MB.`,
+        });
+        // Clear the input value
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+        return;
       }
 
       if (!ACCEPTED_FILE_TYPES.includes(selectedFile.type)) {
         toast({
           variant: "destructive",
           title: "Invalid file type",
-          description: "Please upload a JPG, PNG, PDF, PSD, AI, or CDR file.",
+          description: "Please upload a JPG, PNG, PDF, AI, PSD, or CDR file.",
         });
+        // Clear the input value
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
         return;
       }
       
@@ -204,7 +214,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="file-input" className="text-sm font-medium text-slate-700">Upload artwork (Optional)</label>
+              <label htmlFor="file-input" className="text-sm font-medium text-slate-700">Upload artwork (Optional, 25MB Max)</label>
               <div className="relative group">
                 <input type="file" id="file-input" name="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
                 <label htmlFor="file-input" className={`flex items-center justify-center w-full px-4 py-4 border-2 border-dashed rounded-xl cursor-pointer bg-white transition-all ${file ? 'border-primary-500 bg-primary-50/50 text-primary-700' : 'border-slate-300 text-slate-500 hover:border-primary-400 hover:bg-slate-50'}`}>
