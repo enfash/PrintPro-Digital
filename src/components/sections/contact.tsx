@@ -1,10 +1,7 @@
 
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { useFormState } from 'react-dom';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import React, { useState, useRef, useEffect, useActionState } from 'react';
 import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -12,10 +9,7 @@ import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
-import { ContactFormSchema } from '@/lib/schema';
 import { submitContactForm } from '@/lib/actions';
-
-type ContactFormData = z.infer<typeof ContactFormSchema>;
 
 const initialFormState = {
   success: false,
@@ -24,7 +18,7 @@ const initialFormState = {
 };
 
 const Contact: React.FC = () => {
-  const [state, formAction] = useFormState(submitContactForm, initialFormState);
+  const [state, formAction] = useActionState(submitContactForm, initialFormState);
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -220,5 +214,3 @@ const Contact: React.FC = () => {
 };
 
 export default Contact;
-
-    
