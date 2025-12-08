@@ -68,7 +68,9 @@ const Contact: React.FC = () => {
                   <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-primary-600">
                     <Phone size={20} />
                   </div>
-                  <span className="font-medium">{PHONE_DISPLAY}</span>
+                  <a href={`tel:${PHONE_DISPLAY.replace(/\s/g, '')}`} className="font-medium hover:text-primary-600 transition-colors">
+                    {PHONE_DISPLAY}
+                  </a>
                 </div>
                 <div className="flex items-center gap-4 text-slate-700">
                   <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-primary-600">
@@ -264,5 +266,3 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 }
 
 export default Contact;
-
-    
