@@ -15,6 +15,20 @@ type ContactFormState = {
   }
 }
 
+function getJobTypeFolder(jobType: string): string {
+  switch (jobType) {
+    case 'Flex Banner':
+      return 'flex-banner';
+    case 'Self-Adhesive Vinyl (SAV)':
+      return 'sav';
+    case 'Window / Clear Sticker':
+      return 'window-clear-sticker';
+    default:
+      return 'other';
+  }
+}
+
+
 export async function submitContactForm(
   prevState: ContactFormState,
   formData: FormData
@@ -60,7 +74,8 @@ export async function submitContactForm(
 
     try {
       const bucket = adminStorage.bucket();
-      const filePath = `submissions/${refId}/${fileName}`;
+      const jobTypeFolder = getJobTypeFolder(jobType);
+      const filePath = `submissions/${jobTypeFolder}/${refId}-${fileName}`;
       const fileRef = bucket.file(filePath);
 
       await fileRef.save(fileBuffer, {
