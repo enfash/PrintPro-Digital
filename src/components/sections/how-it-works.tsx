@@ -1,27 +1,58 @@
-import React from 'react';
+
+'use client';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { TIMELINE_STEPS } from '@/lib/constants';
-import { ChevronRight, ArrowDown } from 'lucide-react';
 
 const HowItWorks: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => {
+      if (containerRef.current) {
+        observer.unobserve(containerRef.current);
+      }
+    };
+  }, []);
+
   return (
     <section id="how-it-works" className="py-16 lg:py-24 bg-slate-50 scroll-mt-16">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
-              How It Works
-            </h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              A simple, 3-step process to get your prints delivered fast.
-            </p>
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
+            How It Works
+          </h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            A simple, 3-step process to get your prints delivered fast.
+          </p>
         </div>
 
-        <div className="relative">
+        <div ref={containerRef} className="relative">
           {/* Desktop Connecting Line */}
           <div className="hidden md:block absolute top-8 left-0 right-0 h-0.5 bg-slate-200"></div>
           
           <div className="grid md:grid-cols-3 gap-x-8 gap-y-12">
             {TIMELINE_STEPS.map((step, index) => (
-              <div key={step.id} className="relative flex md:flex-col md:items-center md:text-center">
+              <div 
+                key={step.id} 
+                className={`relative flex md:flex-col md:items-center md:text-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+                style={{ transitionDelay: `${index * 200}ms` }}
+              >
                 {/* Mobile Connecting Line */}
                 {index !== TIMELINE_STEPS.length - 1 && (
                   <div className="md:hidden absolute left-8 top-16 bottom-0 w-0.5 bg-slate-200"></div>
