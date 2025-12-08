@@ -1,11 +1,11 @@
 
 'use client';
 
-import React, { useState, useRef, useTransition, useEffect } from 'react';
-import { useFormState, useForm } from 'react-hook-form';
+import React, { useState, useRef, useEffect } from 'react';
+import { useFormState } from 'react-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Loader2, Upload, X, MessageCircle, CheckCircle, AlertCircle, Phone, Mail, FileCheck } from 'lucide-react';
+import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
@@ -23,75 +23,44 @@ const initialFormState = {
   errors: undefined,
 };
 
-const SubmitButton = () => {
-  const { pending } = useFormState(submitContactForm, initialFormState);
-  return (
-    <Button
-      type="submit"
-      size="lg"
-      className="w-full"
-      disabled={pending}
-    >
-      {pending ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Sending...
-        </>
-      ) : (
-        'Get Price'
-      )}
-    </Button>
-  );
-};
-
 const Contact: React.FC = () => {
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [showTermsModal, setShowTermsModal] = useState(false);
-  
+  const [state, formAction] = useFormState(submitContactForm, initialFormState);
+  const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
 
-  const [formState, formAction] = useFormState(submitContactForm, initialFormState);
-
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-    reset
-  } = useForm<ContactFormData>({
-    resolver: zodResolver(ContactFormSchema),
-    defaultValues: {
-      name: '',
-      phone: '',
-      email: '',
-      jobType: 'Flex Banner',
-      message: '',
-      file: undefined,
-      agreeToTerms: true,
-    }
-  });
+  const [file, setFile] = useState<File | null>(null);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   useEffect(() => {
-    if (formState.success) {
-      setIsSuccess(true);
-      reset();
+    if (state.success) {
+      toast({
+        title: 'Request Sent!',
+        description: 'We have received your details. Our team will review and send you a price shortly.',
+      });
+      formRef.current?.reset();
       setFile(null);
-    } else if (formState.message && !formState.success) {
-        toast({
-            variant: "destructive",
-            title: "Submission Failed",
-            description: formState.message,
-        });
+    } else if (state.message && !state.success) {
+      toast({
+        variant: 'destructive',
+        title: 'Submission Failed',
+        description: state.message,
+      });
     }
-  }, [formState, reset, toast]);
+  }, [state, toast]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
-      setValue('file', selectedFile, { shouldValidate: true });
+      // Basic client-side validation, server will do the rest
+      if (selectedFile.size > 25 * 1024 * 1024) {
+          toast({
+              variant: "destructive",
+              title: "File too large",
+              description: "Max file size is 25MB.",
+          });
+          return;
+      }
       setFile(selectedFile);
     }
   };
@@ -99,16 +68,27 @@ const Contact: React.FC = () => {
   const clearFile = (e: React.MouseEvent) => {
     e.preventDefault();
     setFile(null);
-    setValue('file', undefined, { shouldValidate: true });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
-
-  const resetFormState = () => {
-    setIsSuccess(false);
-    reset();
-  }
+  
+    if (state.success) {
+        return (
+             <div className="bg-slate-50 rounded-3xl p-8 lg:p-10 border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center min-h-[500px]">
+                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
+                    <CheckCircle size={32} />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Sent!</h3>
+                <p className="text-slate-600 mb-6 max-w-sm">
+                    We have received your details. Our team will review and send you a price shortly.
+                </p>
+                <Button onClick={() => window.location.reload()} variant="outline">
+                    Send another request
+                </Button>
+            </div>
+        )
+    }
 
   return (
     <section id="contact" className="py-16 lg:py-24 bg-white scroll-mt-16">
@@ -153,62 +133,47 @@ const Contact: React.FC = () => {
           </div>
 
           <div className="bg-slate-50 rounded-3xl p-8 lg:p-10 border border-slate-100 shadow-sm relative overflow-hidden">
-            {isSuccess && (
-              <div className="absolute inset-0 bg-slate-50 flex flex-col items-center justify-center text-center p-8 z-20 animate-bounce-in">
-                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
-                  <CheckCircle size={32} />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Sent!</h3>
-                <p className="text-slate-600 mb-6">
-                  We have received your details. Our team will review and send you a price shortly.
-                </p>
-                <Button onClick={resetFormState} variant="outline">
-                  Send another request
-                </Button>
-              </div>
-            )}
-            
             <form ref={formRef} action={formAction} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label htmlFor="name" className="text-sm font-medium text-slate-700">Name <span className="text-red-500">*</span></label>
-                  <input {...register("name")} id="name" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="Your name" />
-                  {errors.name && <p className="text-xs text-red-600">{errors.name.message}</p>}
+                  <input name="name" id="name" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="Your name" />
+                  {state.errors?.name && <p className="text-xs text-red-600">{state.errors.name[0]}</p>}
                 </div>
                 <div className="space-y-1.5">
                   <label htmlFor="phone" className="text-sm font-medium text-slate-700">Phone <span className="text-red-500">*</span></label>
-                  <input {...register("phone")} id="phone" type="tel" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="080..." />
-                  {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
+                  <input name="phone" id="phone" type="tel" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="080..." />
+                  {state.errors?.phone && <p className="text-xs text-red-600">{state.errors.phone[0]}</p>}
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <label htmlFor="email" className="text-sm font-medium text-slate-700">Email (Optional)</label>
-                <input {...register("email")} id="email" type="email" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="john@example.com" />
-                {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
+                <input name="email" id="email" type="email" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="john@example.com" />
+                {state.errors?.email && <p className="text-xs text-red-600">{state.errors.email[0]}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <label htmlFor="jobType" className="text-sm font-medium text-slate-700">Job Type <span className="text-red-500">*</span></label>
-                <select {...register("jobType")} id="jobType" defaultValue="Flex Banner" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
+                <select name="jobType" id="jobType" defaultValue="Flex Banner" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
                   <option>Flex Banner</option>
                   <option>Self-Adhesive Vinyl (SAV)</option>
                   <option>Window / Clear Sticker</option>
                   <option>Other</option>
                 </select>
-                {errors.jobType && <p className="text-xs text-red-600">{errors.jobType.message}</p>}
+                {state.errors?.jobType && <p className="text-xs text-red-600">{state.errors.jobType[0]}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <label htmlFor="message" className="text-sm font-medium text-slate-700">Message <span className="text-red-500">*</span></label>
-                <textarea {...register("message")} id="message" rows={4} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none" placeholder="Size, quantity, deadline, any notes..." />
-                {errors.message && <p className="text-xs text-red-600">{errors.message.message}</p>}
+                <textarea name="message" id="message" rows={4} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none" placeholder="Size, quantity, deadline, any notes..." />
+                {state.errors?.message && <p className="text-xs text-red-600">{state.errors.message[0]}</p>}
               </div>
 
               <div className="space-y-1.5">
                 <label htmlFor="file-input" className="text-sm font-medium text-slate-700">Upload artwork (Optional)</label>
                 <div className="relative group">
-                  <input type="file" id="file-input" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+                  <input type="file" id="file-input" name="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
                   <label htmlFor="file-input" className={`flex items-center justify-center w-full px-4 py-4 border-2 border-dashed rounded-xl cursor-pointer bg-white transition-all ${file ? 'border-primary-500 bg-primary-50/50 text-primary-700' : 'border-slate-300 text-slate-500 hover:border-primary-400 hover:bg-slate-50'}`}>
                     {file ? (
                       <div className="flex items-center w-full justify-between">
@@ -226,12 +191,12 @@ const Contact: React.FC = () => {
                     )}
                   </label>
                 </div>
-                 {errors.file && <p className="text-xs text-red-600">{errors.file.message as string}</p>}
+                 {state.errors?.file && <p className="text-xs text-red-600">{state.errors.file[0]}</p>}
               </div>
 
               <div className="flex items-start gap-3 pt-2 pb-1">
                 <div className="flex h-6 items-center">
-                  <input {...register("agreeToTerms")} id="agreeToTerms" type="checkbox" defaultChecked={true} className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-600 cursor-pointer" />
+                  <input name="agreeToTerms" id="agreeToTerms" type="checkbox" defaultChecked={true} className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-600 cursor-pointer" />
                 </div>
                 <div className="text-sm leading-6">
                   <label htmlFor="agreeToTerms" className="text-slate-600 cursor-pointer select-none">
@@ -240,9 +205,11 @@ const Contact: React.FC = () => {
                   </label>
                 </div>
               </div>
-               {errors.agreeToTerms && <p className="text-xs text-red-600">{errors.agreeToTerms.message}</p>}
+               {state.errors?.agreeToTerms && <p className="text-xs text-red-600">{state.errors.agreeToTerms[0]}</p>}
 
-              <SubmitButton />
+              <Button type="submit" size="lg" className="w-full" disabled={false}>
+                Get Price
+              </Button>
             </form>
           </div>
         </div>
@@ -253,3 +220,5 @@ const Contact: React.FC = () => {
 };
 
 export default Contact;
+
+    

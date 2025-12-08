@@ -1,6 +1,4 @@
 
-'use server';
-
 import * as admin from 'firebase-admin';
 
 let adminDb: admin.firestore.Firestore | null = null;
