@@ -39,7 +39,7 @@ export function generateAdminEmailHTML({
             <td style="background:#4659cd; padding:24px; color:#ffffff; text-align:center;">
               <h1 style="margin:0; font-size:22px; font-weight:600;">🎨 New Print Order Request</h1>
               <p style="margin:8px 0 0; font-size:14px; opacity:0.95;">
-                PrintPro Digital
+                BOMedia
               </p>
             </td>
           </tr>
@@ -160,7 +160,7 @@ export function generateCustomerEmailHTML(name: string, jobType: string): string
               </p>
               <hr style="border:none; border-top:1px solid #e5e7eb; margin:24px 0;" />
               <p style="font-size:14px; color:#6b7280; margin:0 0 8px;">
-                <strong style="color:#111827;">PrintPro Digital</strong>
+                <strong style="color:#111827;">BOMedia</strong>
               </p>
               <p style="font-size:14px; color:#6b7280; margin:0 0 8px;">
                 Lagos, Nigeria

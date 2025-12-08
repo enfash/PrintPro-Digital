@@ -40,14 +40,14 @@ const TermsModal: React.FC<TermsModalProps> = ({ isOpen, onClose }) => {
 
                         <div className="prose prose-slate max-w-none text-slate-600">
                             <p className="mb-6">
-                                By engaging <strong>PrintPro Digital</strong> or submitting artwork for printing, you agree to the terms below.
+                                By engaging <strong>BOMedia</strong> or submitting artwork for printing, you agree to the terms below.
                             </p>
 
                             <h3 className="text-lg font-semibold text-slate-800 mt-6 mb-3">Artwork & Design Responsibility</h3>
                             <ul className="list-disc pl-5 space-y-2 mb-4">
                                 <li>Customers are responsible for providing <strong>correct, print-ready artwork</strong>.</li>
                                 <li>All files are reviewed and a digital proof is sent for approval <strong>before printing begins</strong>.</li>
-                                <li>Once a proof is approved, PrintPro Digital is <strong>not responsible</strong> for spelling errors, layout issues, or incorrect content supplied by the customer.</li>
+                                <li>Once a proof is approved, BOMedia is <strong>not responsible</strong> for spelling errors, layout issues, or incorrect content supplied by the customer.</li>
                             </ul>
 
                             <h3 className="text-lg font-semibold text-slate-800 mt-6 mb-3">Colour Variation Disclaimer</h3>
@@ -71,8 +71,8 @@ const TermsModal: React.FC<TermsModalProps> = ({ isOpen, onClose }) => {
                             
                             <p className="mt-6">
                                 For questions, contact:{' '}
-                                <a href="mailto:info@printpro.ng" className="text-primary-700 hover:text-primary-800 font-medium">
-                                    info@printpro.ng
+                                <a href="mailto:info@bomedia.ng" className="text-primary-700 hover:text-primary-800 font-medium">
+                                    info@bomedia.ng
                                 </a>
                             </p>
                         </div>
