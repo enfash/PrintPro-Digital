@@ -14,7 +14,7 @@ function handleError(error: any, message: string, status: number = 500) {
 
 export async function POST(request: NextRequest) {
     if (!adminDb || !adminStorage) {
-        return handleError(new Error('Firebase Admin not initialized.'), 'Server configuration error');
+        return handleError(new Error('Firebase Admin not initialized. Check server logs for details.'), 'Server configuration error');
     }
 
     const formData = await request.formData();

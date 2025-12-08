@@ -19,7 +19,7 @@ if (isConfigured && !admin.apps.length) {
         privateKey: privateKey,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       }),
-      storageBucket: 'studio-next-bom-lf', // Explicitly set the custom bucket name
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
     });
     console.log('✅ Firebase Admin SDK initialized successfully.');
   } catch (e: any) {
