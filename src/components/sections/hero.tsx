@@ -5,8 +5,11 @@ import { WHATSAPP_LINK } from '@/lib/constants';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function Hero() {
+  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-main');
+
   return (
     <div className="relative bg-slate-50 pt-32 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
       <div className="container mx-auto px-6">
@@ -30,7 +33,7 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              <strong>Broad Options Media (BOMedia)</strong> prints sharp, large-format banners and stickers for Lagos businesses - flex banners, self-adhesive vinyl (SAV), window graphics and wall branding - with 4-6 hour production and same-day delivery across Lagos.
+              <strong>BOMedia</strong> prints sharp, large-format banners and stickers for Lagos businesses - flex banners, self-adhesive vinyl (SAV), window graphics and wall branding - with 4-6 hour production and same-day delivery across Lagos.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
@@ -66,14 +69,20 @@ export default function Hero() {
           {/* Hero Image - Single Static */}
           <div className="flex-1 w-full max-w-lg lg:max-w-none">
             <div className="relative aspect-square lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src="https://picsum.photos/seed/hero/800/600"
-                alt="A collection of high-quality large format prints including a vibrant flex banner and detailed window graphics, representing BOMedia's services."
-                fill
-                priority
-                className="object-cover"
-                data-ai-hint="printing samples"
-              />
+              {heroImage ? (
+                <Image
+                  src={heroImage.imageUrl}
+                  alt={heroImage.description}
+                  fill
+                  priority
+                  className="object-cover"
+                  data-ai-hint={heroImage.imageHint}
+                />
+              ) : (
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center">
+                  <p className="text-slate-500">Hero image not found</p>
+                </div>
+              )}
               {/* Overlay Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent pointer-events-none"></div>
             </div>
