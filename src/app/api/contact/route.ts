@@ -9,20 +9,29 @@ export async function POST(request: NextRequest) {
   const initialState = {
     success: false,
     message: '',
+    errors: undefined,
   };
 
-  const result = await submitContactForm(initialState, formData);
+  try {
+    const result = await submitContactForm(initialState, formData);
 
-  if (!result.success) {
+    if (!result.success) {
+      return NextResponse.json({
+        success: false,
+        error: result.message,
+        errors: result.errors
+      }, { status: 400 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: result.message,
+    });
+  } catch (error: any) {
+    console.error('Unhandled error in POST /api/contact:', error);
     return NextResponse.json({
       success: false,
-      error: result.message,
-      errors: result.errors
-    }, { status: 400 });
+      error: 'An unexpected server error occurred.',
+    }, { status: 500 });
   }
-
-  return NextResponse.json({
-    success: true,
-    message: result.message,
-  });
 }

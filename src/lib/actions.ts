@@ -143,7 +143,7 @@ export async function submitContactForm(
       await resend.emails.send({
         from: RESEND_FROM_EMAIL,
         to: email,
-        subject: `Order Received [#${refId}] - PrintPro Digital`,
+        subject: `Order Received [#${refId}] - BOMedia`,
         html: customerEmailHTML,
       });
     }
