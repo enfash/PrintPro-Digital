@@ -1,10 +1,10 @@
-
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { Button } from '../ui/button';
 
 const GALLERY_ITEMS = PlaceHolderImages.filter(img => img.id.startsWith('gallery-')).map(item => ({
   id: item.id,
@@ -16,11 +16,14 @@ const GALLERY_ITEMS = PlaceHolderImages.filter(img => img.id.startsWith('gallery
 
 
 const Gallery: React.FC = () => {
-  const [activeIndex, setActiveIndex] = React.useState(2); // The focused item index relative to the visible window (0-3)
-  const [startIndex, setStartIndex] = React.useState(0); // The starting index of the visible slice
+  const [activeIndex, setActiveIndex] = React.useState(2);
+  const [startIndex, setStartIndex] = React.useState(0);
+  const [showAllMobile, setShowAllMobile] = useState(false);
 
-  const visibleItems = [];
   const totalItems = GALLERY_ITEMS.length;
+
+  // Logic for desktop slider
+  const visibleItems = [];
   for (let i = 0; i < 4; i++) {
     visibleItems.push(GALLERY_ITEMS[(startIndex + i) % totalItems]);
   }
@@ -33,6 +36,9 @@ const Gallery: React.FC = () => {
     setStartIndex((prev) => (prev - 1 + totalItems) % totalItems);
   };
 
+  // Logic for mobile grid
+  const mobileVisibleItems = showAllMobile ? GALLERY_ITEMS : GALLERY_ITEMS.slice(0, 6);
+
   return (
     <section id="gallery" className="py-16 lg:py-24 bg-white relative scroll-mt-16">
       <div className="container mx-auto px-6">
@@ -44,7 +50,6 @@ const Gallery: React.FC = () => {
             <p className="text-lg text-slate-600">Some of our work around Lagos.</p>
           </div>
 
-          {/* Navigation Buttons */}
           <div className="hidden md:flex gap-4">
             <button
               onClick={handlePrev}
@@ -63,7 +68,8 @@ const Gallery: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex flex-col md:flex-row w-full items-center justify-center gap-3">
+        {/* Desktop Slider */}
+        <div className="hidden md:flex flex-col md:flex-row w-full items-center justify-center gap-3">
           {visibleItems.map((item, index) => {
             const isActive = index === activeIndex;
 
@@ -83,11 +89,8 @@ const Gallery: React.FC = () => {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   loading="lazy"
                 />
-
-                {/* Gradient Overlay */}
                 <div className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                   }`}></div>
-
                 <div className={`absolute bottom-0 left-0 w-full p-6 flex flex-col justify-end transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                   }`}>
                   <p className="text-white font-medium text-lg leading-tight">{item.caption}</p>
@@ -96,6 +99,45 @@ const Gallery: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Mobile Grid */}
+        <div className="md:hidden">
+          <div className="grid grid-cols-2 gap-4">
+            {mobileVisibleItems.map((item) => (
+              <div
+                key={item.id}
+                className="group relative cursor-pointer overflow-hidden rounded-2xl aspect-[4/5]"
+              >
+                <Image
+                  src={item.imageUrl}
+                  alt={item.altText}
+                  fill
+                  data-ai-hint={item.hint}
+                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  sizes="50vw"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 w-full p-4">
+                  <p className="text-white font-semibold text-sm leading-tight">{item.caption}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {!showAllMobile && GALLERY_ITEMS.length > 6 && (
+            <div className="mt-8 text-center">
+              <Button
+                onClick={() => setShowAllMobile(true)}
+                variant="outline"
+                size="lg"
+              >
+                Show more work
+              </Button>
+            </div>
+          )}
+        </div>
+
       </div>
     </section>
   );
