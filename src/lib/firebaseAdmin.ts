@@ -19,7 +19,7 @@ if (isConfigured && !admin.apps.length) {
         privateKey: privateKey,
         clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
       }),
-      storageBucket: `${process.env.FIREBASE_PROJECT_ID}.appspot.com`,
+      storageBucket: 'studio-next-bom-lf', // Explicitly set the custom bucket name
     });
     console.log('✅ Firebase Admin SDK initialized successfully.');
   } catch (e: any) {
@@ -28,13 +28,14 @@ if (isConfigured && !admin.apps.length) {
       e.message
     );
   }
-} else if (!isConfigured) {
+} else if (!admin.apps.length) {
   console.warn(
     '⚠️ Firebase Admin environment variables are not set. Server-side Firebase features will be disabled.'
   );
 }
 
-const adminDb = admin.firestore();
-const adminStorage = admin.storage();
+const adminDb = admin.apps.length ? admin.firestore() : null;
+const adminStorage = admin.apps.length ? admin.storage() : null;
+
 
 export { adminDb, adminStorage, app as adminApp };

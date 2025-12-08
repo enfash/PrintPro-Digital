@@ -13,6 +13,10 @@ function handleError(error: any, message: string, status: number = 500) {
 }
 
 export async function POST(request: NextRequest) {
+    if (!adminDb || !adminStorage) {
+        return handleError(new Error('Firebase Admin not initialized.'), 'Server configuration error');
+    }
+
     const formData = await request.formData();
 
     // --- 1. Extract and Validate Data ---
@@ -44,9 +48,8 @@ export async function POST(request: NextRequest) {
         fileBuffer = Buffer.from(arrayBuffer);
     }
     
-
     // --- 2. Upload File to Firebase Storage (if it exists) ---
-    if (fileBuffer && fileName) {
+    if (fileBuffer && fileName && adminStorage) {
         try {
             const bucket = adminStorage.bucket();
             const filePath = `submissions/${refId}/${fileName}`;
@@ -66,24 +69,27 @@ export async function POST(request: NextRequest) {
     }
 
     // --- 3. Save Submission to Firestore ---
-    try {
-        const submissionData = {
-            refId,
-            name,
-            phone,
-            email,
-            jobType,
-            message,
-            fileUrl,
-            fileName,
-            fileSize,
-            agreeToUpdates,
-            submittedAt: new Date().toISOString(),
-        };
-        await adminDb.collection('submissions').add(submissionData);
-    } catch (firestoreError) => {
-        return handleError(firestoreError, 'Failed to save submission');
+    if(adminDb) {
+        try {
+            const submissionData = {
+                refId,
+                name,
+                phone,
+                email,
+                jobType,
+                message,
+                fileUrl,
+                fileName,
+                fileSize,
+                agreeToUpdates,
+                submittedAt: new Date().toISOString(),
+            };
+            await adminDb.collection('submissions').add(submissionData);
+        } catch (firestoreError) {
+            return handleError(firestoreError, 'Failed to save submission');
+        }
     }
+
 
     // --- 4. Send Emails (with graceful failure) ---
     try {
