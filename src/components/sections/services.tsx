@@ -44,23 +44,25 @@ const Services: React.FC = () => {
           {SERVICES.map((service, index) => (
             <div 
               key={service.id} 
-              className={`group relative p-8 bg-slate-50 rounded-2xl border border-slate-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300 ${isVisible ? 'animate-bounce-in' : 'opacity-0'}`}
+              className={`group relative p-6 sm:p-8 bg-slate-50 rounded-2xl border border-slate-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300 flex flex-row md:flex-col items-start gap-5 ${isVisible ? 'animate-bounce-in' : 'opacity-0'}`}
               style={{ animationDelay: `${index * 150}ms` }}
             >
-              <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">
+              <div className="w-12 h-12 flex-shrink-0 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 md:mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">
                 <service.icon size={24} />
               </div>
               
-              <Link href="/#contact" className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary-700 transition-colors">
-                {service.title}
-              </Link>
-              
-              <p className="text-slate-600 mb-6 leading-relaxed">
-                {service.description}
-              </p>
-              
-              <div className="inline-flex items-center text-xs font-semibold text-primary-700 bg-primary-50 px-3 py-1 rounded-full">
-                {service.meta}
+              <div className="flex-grow">
+                <Link href="/#contact" className="text-lg md:text-xl font-bold text-slate-900 mb-2 md:mb-3 group-hover:text-primary-700 transition-colors block">
+                  {service.title}
+                </Link>
+                
+                <p className="text-slate-600 mb-4 md:mb-6 leading-relaxed text-sm md:text-base">
+                  {service.description}
+                </p>
+                
+                <div className="inline-flex items-center text-xs font-semibold text-primary-700 bg-primary-50 px-3 py-1 rounded-full">
+                  {service.meta}
+                </div>
               </div>
             </div>
           ))}
