@@ -67,6 +67,11 @@ const Services: React.FC = () => {
             </div>
           ))}
         </div>
+        <div className="text-center mt-12">
+            <p className="text-slate-600 text-sm">
+                Perfect for: shops, churches, events, real estate agents and schools in Lagos.
+            </p>
+        </div>
       </div>
     </section>
   );

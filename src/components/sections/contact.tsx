@@ -106,7 +106,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
         description: 'We have received your details. Our team will review and send you a price shortly.',
       });
       // Do not reset form here, the success UI is shown instead
-    } else if (state.message && !state.success) {
+    } else if (state.message && !state.success && !state.errors) {
       // This will now only show for server-side errors, not validation errors.
       toast({
         variant: 'destructive',
@@ -251,6 +251,10 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             {state.errors?.agreeToTerms && <p className="text-xs text-red-600">{state.errors.agreeToTerms[0]}</p>}
 
             <SubmitButton />
+
+            <p className="text-xs text-slate-500 text-center pt-2">
+              We’ll never share your details with third parties. See our <Link href="/privacy-policy" className="underline">Privacy Policy</Link>.
+            </p>
           </form>
         )}
       </div>
