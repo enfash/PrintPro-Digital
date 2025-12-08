@@ -70,6 +70,7 @@ export default function Hero() {
                 src="https://picsum.photos/seed/hero/800/600"
                 alt="A collection of high-quality large format prints including a vibrant flex banner and detailed window graphics, representing BOMedia's services."
                 fill
+                priority
                 className="object-cover"
                 data-ai-hint="printing samples"
               />
