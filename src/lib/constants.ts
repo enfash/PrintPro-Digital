@@ -92,7 +92,7 @@ export const FAQS: FAQItem[] = [
   },
   {
     question: 'Can I get same-day printing in Lagos?',
-    answer: 'Most standard jobs are ready within 4–6 hours after artwork approval. For same-day delivery, contact us early in the morning with your requirements.',
+    answer: 'Most standard jobs are ready within 4-6 hours after artwork approval. For same-day delivery, contact us early in the morning with your requirements.',
   },
   {
     question: 'Do you deliver to Lekki, Victoria Island, or Ikeja?',
@@ -108,7 +108,7 @@ export const FAQS: FAQItem[] = [
   },
   {
     question: 'How long does printing take?',
-    answer: 'Most standard jobs are ready within 4–6 hours after artwork approval. Large quantities or complex jobs may take longer.',
+    answer: 'Most standard jobs are ready within 4-6 hours after artwork approval. Large quantities or complex jobs may take longer.',
   },
   {
     question: 'Do you offer installation?',

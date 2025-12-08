@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     type: "website",
     url: "https://bomedia.ng/",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
-    description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48–72 hour turnaround on standard jobs.",
+    description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
     images: "https://bomedia.ng/images/og-image.jpg",
     locale: "en_NG",
     siteName: "BOMedia Large Format Printing",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     url: "https://bomedia.ng/",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
-    description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48–72 hour turnaround on standard jobs.",
+    description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
     images: "https://bomedia.ng/images/og-image.jpg",
   },
 };
