@@ -10,6 +10,7 @@ import TermsModal from '../modals/TermsModal';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { submitContactForm } from '@/lib/actions';
+import { ACCEPTED_FILE_TYPES } from '@/lib/schema';
 
 const initialFormState = {
   success: false,
@@ -117,6 +118,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
+
       if (selectedFile.size > 25 * 1024 * 1024) {
           toast({
               variant: "destructive",
@@ -125,6 +127,16 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
           });
           return;
       }
+
+      if (!ACCEPTED_FILE_TYPES.includes(selectedFile.type)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid file type",
+          description: "Please upload a JPG, PNG, PDF, PSD, AI, or CDR file.",
+        });
+        return;
+      }
+      
       setFile(selectedFile);
     }
   };
