@@ -3,6 +3,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { SERVICES } from '@/lib/constants';
+import Link from 'next/link';
 
 const Services: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -50,9 +51,9 @@ const Services: React.FC = () => {
                 <service.icon size={24} />
               </div>
               
-              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary-700 transition-colors">
+              <Link href="/#contact" className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary-700 transition-colors">
                 {service.title}
-              </h3>
+              </Link>
               
               <p className="text-slate-600 mb-6 leading-relaxed">
                 {service.description}

@@ -68,7 +68,7 @@ export default function Hero() {
             <div className="relative aspect-square lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
               <Image
                 src="https://picsum.photos/seed/hero/800/600"
-                alt="BOMedia large format printing samples - flex banners, SAV, window graphics"
+                alt="A collection of high-quality large format prints including a vibrant flex banner and detailed window graphics, representing BOMedia's services."
                 fill
                 className="object-cover"
                 data-ai-hint="printing samples"

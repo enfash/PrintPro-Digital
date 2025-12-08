@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -9,6 +10,7 @@ const GALLERY_ITEMS = PlaceHolderImages.filter(img => img.id.startsWith('gallery
   id: item.id,
   imageUrl: item.imageUrl,
   caption: item.description,
+  altText: `An example of BOMedia's work: ${item.description}`,
   hint: item.imageHint
 }));
 
@@ -74,7 +76,7 @@ const Gallery: React.FC = () => {
               >
                 <Image
                   src={item.imageUrl}
-                  alt={item.caption}
+                  alt={item.altText}
                   fill
                   data-ai-hint={item.hint}
                   className="size-full object-cover transition-transform duration-700 group-hover:scale-110"
