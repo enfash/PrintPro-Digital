@@ -1,8 +1,11 @@
+
 'use server';
 
 import * as admin from 'firebase-admin';
 
-let app: admin.app.App;
+let adminDb: admin.firestore.Firestore | null = null;
+let adminStorage: admin.storage.Storage | null = null;
+let adminApp: admin.app.App | null = null;
 
 const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
 
@@ -14,11 +17,9 @@ const isConfigured =
 
 if (isConfigured && !admin.apps.length) {
   try {
-    // Ensure we only pass the bucket name (e.g., "my-bucket.appspot.com")
-    // and not the full gs:// URL.
-    const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET!.replace('gs://', '');
+    const bucketName = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET;
 
-    app = admin.initializeApp({
+    adminApp = admin.initializeApp({
       credential: admin.credential.cert({
         projectId: process.env.FIREBASE_PROJECT_ID,
         privateKey: privateKey,
@@ -26,21 +27,24 @@ if (isConfigured && !admin.apps.length) {
       }),
       storageBucket: bucketName,
     });
+
+    adminDb = admin.firestore();
+    adminStorage = admin.storage();
     console.log('✅ Firebase Admin SDK initialized successfully.');
+
   } catch (e: any) {
-    console.error(
-      '❌ Failed to initialize Firebase Admin SDK:',
-      e.message
-    );
+    console.error('❌ Failed to initialize Firebase Admin SDK:', e.message);
   }
 } else if (!admin.apps.length) {
   console.warn(
     '⚠️ Firebase Admin environment variables are not set. Server-side Firebase features will be disabled.'
   );
+} else {
+    adminApp = admin.apps[0];
+    if (adminApp) {
+        adminDb = admin.firestore(adminApp);
+        adminStorage = admin.storage(adminApp);
+    }
 }
 
-const adminDb = admin.apps.length ? admin.firestore() : null;
-const adminStorage = admin.apps.length ? admin.storage() : null;
-
-
-export { adminDb, adminStorage, app as adminApp };
+export { adminDb, adminStorage, adminApp };
