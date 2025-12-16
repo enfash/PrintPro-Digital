@@ -66,11 +66,11 @@ const Footer: React.FC = () => {
                 Instagram
               </a>
               <a
-                href="mailto:info@bomedia.ng"
+                href="mailto:info@bomedia.com.ng"
                 className="flex items-center justify-center md:justify-start gap-2 hover:text-white transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                info@bomedia.ng
+                info@bomedia.com.ng
               </a>
               <div className="flex items-center justify-center md:justify-start gap-2">
                 <MapPin className="w-4 h-4" />

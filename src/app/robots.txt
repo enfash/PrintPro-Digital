@@ -4,4 +4,4 @@
 User-agent: *
 Disallow:
 
-Sitemap: https://bomedia.ng/sitemap.xml
+Sitemap: https://bomedia.com.ng/sitemap.xml

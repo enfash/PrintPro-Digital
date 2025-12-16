@@ -11,7 +11,7 @@ import { NavItem, ServiceItem, TimelineStep, GalleryItem, FAQItem } from './type
 export const WHATSAPP_LINK = "https://wa.me/2348022247567?text=Hi%20BOMedia%2C%20I%20need%20a%20quote%20for%20large%20format%20printing.";
 export const WHATSAPP_CORPORATE_LINK = "https://wa.me/2348022247567?text=Hi%20BOMedia%2C%20I%20have%20a%20corporate/bulk%20printing%20order.%20I'd%20like%20to%20discuss%20scheduling%20and%20quotations%20for%20my%20business.";
 export const PHONE_DISPLAY = "+234 802 224 7567";
-export const EMAIL_DISPLAY = "info@bomedia.ng";
+export const EMAIL_DISPLAY = "info@bomedia.com.ng";
 
 export const NAV_LINKS: NavItem[] = [
   { label: 'What we print', href: '/#services' },
@@ -83,62 +83,31 @@ export const GALLERY_ITEMS: GalleryItem[] = [
 
 export const FAQS: FAQItem[] = [
   {
-    question: 'What do you print?',
-    answer: 'We focus on large-format printing: flex banners, self-adhesive vinyl (SAV), window graphics, wall branding, and clear stickers. We do not print business cards, flyers, books.',
+    question: 'What types of printing do you specialize in?',
+    answer: 'We focus on large-format printing, which includes flex banners, self-adhesive vinyl (SAV) for branding, window graphics, wall wraps, and clear stickers. We do not print small items like business cards, flyers, or books.',
   },
   {
-    question: 'How much does a banner cost in Lagos?',
-    answer: 'Banner pricing depends on size (measured in square feet), material type, and finishing such as eyelets or lamination. We price per square foot and provide quick quotes once details are shared.',
+    question: 'Do you handle bulk orders for businesses?',
+    answer: 'Yes, absolutely. We handle both one-off jobs and large-volume projects for brands, agencies, and growing businesses. We issue official invoices and can schedule production for campaigns or events.',
   },
   {
-    question: 'Can I get same-day printing in Lagos?',
-    answer: 'Most standard jobs are ready within 4-6 hours after artwork approval. For same-day delivery, contact us early in the morning with your requirements.',
+    question: 'How fast is your turnaround time?',
+    answer: 'Most standard jobs are ready within 4-6 hours after artwork approval. For same-day delivery, it is best to contact us early in the morning with your print-ready files.',
   },
   {
-    question: 'Do you deliver to Lekki, Victoria Island, or Ikeja?',
-    answer: 'Yes. We deliver across Lagos including Lekki, Victoria Island, Ikeja, Yaba, and Surulere. You can also pick up your order from our location.',
+    question: 'What areas in Lagos do you deliver to?',
+    answer: 'We deliver to all locations across Lagos, including Lekki, Victoria Island, Ikeja, Yaba, and Surulere. You can also pick up your order directly from us.',
   },
   {
-    question: 'What file formats do you accept?',
-    answer: 'We accept CDR, PSD, AI, PDF, and high-resolution JPG or PNG files. All artwork should be clear, correctly sized, and print-ready.',
+    question: 'What file format is best for printing?',
+    answer: 'For the best quality, we recommend providing your artwork in CorelDRAW (CDR), Adobe Photoshop (PSD), Adobe Illustrator (AI), or high-resolution PDF formats. We also accept clear JPG and PNG files.',
   },
   {
-    question: 'What size banners can you print?',
-    answer: 'We print large format materials in custom sizes up to several meters wide. Share your exact dimensions and we will confirm if we can handle it.',
+    question: 'How are your print jobs priced?',
+    answer: 'Our prices are based on the material type and the total size in square meters. We provide an instant quote as soon as you share the job details with us.',
   },
   {
-    question: 'How long does printing take?',
-    answer: 'Most standard jobs are ready within 4-6 hours after artwork approval. Large quantities or complex jobs may take longer.',
-  },
-  {
-    question: 'Do you offer installation?',
-    answer: 'We handle printing. Installation can be arranged separately on request, depending on location and job type.',
-  },
-];
-
-export const CORPORATE_FAQS: FAQItem[] = [
-  {
-    question: 'Do you handle bulk or repeat corporate jobs?',
-    answer: 'Yes. We work with businesses that require bulk printing, repeat orders, and consistent branding across multiple locations.',
-  },
-  {
-    question: 'Can you match previous prints or brand colours?',
-    answer: 'Yes. We keep records of past jobs and follow brand guidelines to ensure consistency across reprints.',
-  },
-  {
-    question: 'Do you issue invoices and receipts?',
-    answer: 'Yes. Official invoices and payment receipts are issued for all corporate jobs, making it suitable for internal accounting and procurement processes.',
-  },
-  {
-    question: 'What is your turnaround time for bulk orders?',
-    answer: 'Turnaround depends on volume and finishing. Timelines are confirmed upfront before production begins, ensuring alignment with your campaign or event schedule.',
-  },
-  {
-    question: 'Can we schedule printing for events or campaigns?',
-    answer: 'Yes. Advance scheduling is available for time-sensitive campaigns and events.',
-  },
-  {
-    question: 'Do you work with agencies and resellers?',
-    answer: 'Yes. We partner with agencies, designers, and resellers under agreed terms.',
+    question: 'Do you offer installation for printed materials?',
+    answer: 'Our primary service is printing. However, installation for items like SAV and window graphics can be arranged separately upon request, depending on the location and complexity of the job.',
   },
 ];

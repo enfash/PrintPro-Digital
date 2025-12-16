@@ -71,8 +71,8 @@ const TermsModal: React.FC<TermsModalProps> = ({ isOpen, onClose }) => {
                             
                             <p className="mt-6">
                                 For questions, contact:{' '}
-                                <a href="mailto:info@bomedia.ng" className="text-primary-700 hover:text-primary-800 font-medium">
-                                    info@bomedia.ng
+                                <a href="mailto:info@bomedia.com.ng" className="text-primary-700 hover:text-primary-800 font-medium">
+                                    info@bomedia.com.ng
                                 </a>
                             </p>
                         </div>

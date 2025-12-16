@@ -1,6 +1,6 @@
 
 import type {Metadata} from 'next';
-import Script from 'next/script';
+import { GoogleTagManager } from '@next/third-parties/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
@@ -14,19 +14,18 @@ export const metadata: Metadata = {
   robots: "index, follow",
   openGraph: {
     type: "website",
-    url: "https://bomedia.ng/",
+    url: "https://bomedia.com.ng/",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
-    images: "https://bomedia.ng/images/og-image.jpg",
+    images: "https://bomedia.com.ng/images/og-image.jpg",
     locale: "en_NG",
     siteName: "BOMedia Large Format Printing",
   },
   twitter: {
     card: "summary_large_image",
-    url: "https://bomedia.ng/",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
-    images: "https://bomedia.ng/images/og-image.jpg",
+    images: "https://bomedia.com.ng/images/og-image.jpg",
   },
 };
 
@@ -38,14 +37,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="!scroll-smooth" suppressHydrationWarning>
       <head>
-        <Script id="google-tag-manager" strategy="afterInteractive">
-          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-          })(window,document,'script','dataLayer','GTM-PF8CQGCX');`}
-        </Script>
-        <link rel="canonical" href="https://bomedia.ng/" />
+        <link rel="canonical" href="https://bomedia.com.ng/" />
         
         {/* Favicon */}
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
@@ -69,11 +61,11 @@ export default function RootLayout({
   "@type": "LocalBusiness",
   "name": "BOMedia - Broad Options Media",
   "alternateName": "BOMedia",
-  "image": "https://bomedia.ng/images/og-image.jpg",
-  "@id": "https://bomedia.ng",
-  "url": "https://bomedia.ng",
+  "image": "https://bomedia.com.ng/images/og-image.jpg",
+  "@id": "https://bomedia.com.ng",
+  "url": "https://bomedia.com.ng",
   "telephone": "+234-802-224-7567",
-  "email": "info@bomedia.ng",
+  "email": "info@bomedia.com.ng",
   "priceRange": "₦₦",
   "address": {
     "@type": "PostalAddress",
@@ -196,17 +188,10 @@ export default function RootLayout({
 ` }} />
       </head>
       <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", "font-body")} suppressHydrationWarning>
-        <noscript>
-            <iframe
-                src="https://www.googletagmanager.com/ns.html?id=GTM-PF8CQGCX"
-                height="0"
-                width="0"
-                style={{ display: 'none', visibility: 'hidden' }}
-            ></iframe>
-        </noscript>
         <FirebaseErrorListener />
         {children}
         <Toaster />
+        <GoogleTagManager gtmId="GTM-PF8CQGCX" />
       </body>
     </html>
   );

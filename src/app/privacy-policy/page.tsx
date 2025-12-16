@@ -68,8 +68,8 @@ const PrivacyPolicy: React.FC = () => {
                             <h2 className="text-2xl font-bold text-slate-900 mt-8 mb-4">Contact</h2>
                             <p className="text-slate-600">
                                 For privacy-related enquiries, contact us at:{' '}
-                                <a href="mailto:info@bomedia.ng" className="text-primary-700 hover:text-primary-800 font-medium">
-                                    info@bomedia.ng
+                                <a href="mailto:info@bomedia.com.ng" className="text-primary-700 hover:text-primary-800 font-medium">
+                                    info@bomedia.com.ng
                                 </a>
                             </p>
                         </div>
