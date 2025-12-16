@@ -6,7 +6,7 @@ import {
   FileCheck,
   Truck
 } from 'lucide-react';
-import { NavItem, ServiceItem, TimelineStep, GalleryItem, FAQItem } from './types';
+import { NavItem, ServiceItem, TimelineStep, FAQItem } from './types';
 
 export const WHATSAPP_LINK = "https://wa.me/2348022247567?text=Hi%20BOMedia%2C%20I%20need%20a%20quote%20for%20large%20format%20printing.";
 export const WHATSAPP_CORPORATE_LINK = "https://wa.me/2348022247567?text=Hi%20BOMedia%2C%20I%20have%20a%20corporate/bulk%20printing%20order.%20I'd%20like%20to%20discuss%20scheduling%20and%20quotations%20for%20my%20business.";
@@ -66,48 +66,37 @@ export const TIMELINE_STEPS: TimelineStep[] = [
   },
 ];
 
-export const HERO_IMAGES: string[] = [
-  '/images/hero/1.png',
-  '/images/hero/2.png',
-  '/images/hero/3.png',
-];
-
-export const GALLERY_ITEMS: GalleryItem[] = [
-  { id: 1, imageUrl: '/images/gallery/1.png', caption: 'Shopfront flex banner' },
-  { id: 2, imageUrl: '/images/gallery/2.png', caption: 'Window branding' },
-  { id: 3, imageUrl: '/images/gallery/3.png', caption: 'Event back-drop banner' },
-  { id: 4, imageUrl: '/images/gallery/4.png', caption: 'Clear sticker details' },
-  { id: 5, imageUrl: '/images/gallery/5.png', caption: 'SAV Wall wrap' },
-  { id: 6, imageUrl: '/images/gallery/6.png', caption: 'Roll-up banner stand' },
-];
-
 export const FAQS: FAQItem[] = [
   {
-    question: 'What types of printing do you specialize in?',
-    answer: 'We focus on large-format printing, which includes flex banners, self-adhesive vinyl (SAV) for branding, window graphics, wall wraps, and clear stickers. We do not print small items like business cards, flyers, or books.',
+    question: 'What do you print?',
+    answer: 'We specialise in large-format printing, including flex banners, self-adhesive vinyl (SAV), window graphics, wall branding, and clear stickers. Our focus is on high-impact visual prints for brands, businesses, and agencies, rather than small paper items like business cards or flyers.',
   },
   {
-    question: 'Do you handle bulk orders for businesses?',
-    answer: 'Yes, absolutely. We handle both one-off jobs and large-volume projects for brands, agencies, and growing businesses. We issue official invoices and can schedule production for campaigns or events.',
+    question: 'How much does a banner cost in Lagos?',
+    answer: 'Pricing depends on size, material, finishing, and quantity. We keep our rates competitive and transparent — once we know your requirements, we’ll give you a clear quote with no surprises.<br/><br/>📩 <a href="/#contact" class="font-medium text-primary-600 hover:underline">Send your size and use-case to get an instant quote.</a>',
   },
   {
-    question: 'How fast is your turnaround time?',
-    answer: 'Most standard jobs are ready within 4-6 hours after artwork approval. For same-day delivery, it is best to contact us early in the morning with your print-ready files.',
+    question: 'Can I get same-day printing in Lagos?',
+    answer: 'Yes — same-day printing is available for select jobs, depending on size, material, and production queue. If timing is critical, let us know upfront and we’ll confirm feasibility immediately.',
   },
   {
-    question: 'What areas in Lagos do you deliver to?',
-    answer: 'We deliver to all locations across Lagos, including Lekki, Victoria Island, Ikeja, Yaba, and Surulere. You can also pick up your order directly from us.',
+    question: 'Do you deliver to Lekki, Victoria Island, or Ikeja?',
+    answer: 'Yes. We deliver across Lagos, including Lekki, Victoria Island, Ikeja, and surrounding areas. Delivery timelines and costs depend on location and job size, and will be confirmed with your quote.',
   },
   {
-    question: 'What file format is best for printing?',
-    answer: 'For the best quality, we recommend providing your artwork in CorelDRAW (CDR), Adobe Photoshop (PSD), Adobe Illustrator (AI), or high-resolution PDF formats. We also accept clear JPG and PNG files.',
+    question: 'What file formats do you accept?',
+    answer: 'We accept PDF, AI, PSD, and high-resolution JPG/PNG files. For best results, files should be print-ready. If you’re unsure, we can quickly review your design before production.',
   },
   {
-    question: 'How are your print jobs priced?',
-    answer: 'Our prices are based on the material type and the total size in square meters. We provide an instant quote as soon as you share the job details with us.',
+    question: 'What banner sizes can you print?',
+    answer: 'We print custom sizes based on your needs, from small promotional banners to very large-scale formats. Tell us where the banner will be used, and we’ll recommend the right size and material.',
   },
   {
-    question: 'Do you offer installation for printed materials?',
-    answer: 'Our primary service is printing. However, installation for items like SAV and window graphics can be arranged separately upon request, depending on the location and complexity of the job.',
+    question: 'How long does printing take?',
+    answer: 'Turnaround depends on job size and finishing, but most projects are completed within 24–72 hours. Urgent jobs can often be prioritised — just let us know your deadline.',
+  },
+  {
+    question: 'Do you offer installation?',
+    answer: 'Yes. We offer professional installation for wall branding, window graphics, and other large-format applications within Lagos. Installation can be included as part of your quote.',
   },
 ];
