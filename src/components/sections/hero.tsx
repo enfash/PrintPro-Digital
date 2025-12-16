@@ -1,4 +1,6 @@
 
+'use client';
+
 import React from 'react';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import { WHATSAPP_LINK } from '@/lib/constants';
@@ -7,8 +9,23 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 export default function Hero() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-main');
+
+  const handleTrackedClick = (location: string) => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'whatsapp_click', {
+        location: location,
+        page: window.location.pathname,
+      });
+    }
+  };
 
   return (
     <div className="relative bg-slate-50 pt-32 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
@@ -38,7 +55,11 @@ export default function Hero() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                <Button asChild size="lg">
-                 <Link href={WHATSAPP_LINK} target="_blank">
+                 <Link 
+                  href={WHATSAPP_LINK} 
+                  target="_blank"
+                  onClick={() => handleTrackedClick('hero_whatsapp_quote')}
+                 >
                     Get a Quote
                     <ArrowRight className="w-5 h-5" />
                  </Link>

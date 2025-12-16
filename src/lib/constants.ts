@@ -67,12 +67,14 @@ export const TIMELINE_STEPS: TimelineStep[] = [
   },
 ];
 
+const gtag = (location: string) => `gtag('event','whatsapp_click',{location:'${location}',page:window.location.pathname})`;
+
 export const FAQS: FAQItem[] = [
   {
     question: 'What do you print?',
     answer: `We specialise in <strong>large-format printing</strong>, including flex banners, self-adhesive vinyl (SAV), window graphics, wall branding, and clear stickers. Our focus is on <strong>high-impact visual prints for brands, businesses, and agencies</strong>, rather than small paper items like business cards or flyers.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20I'd%20like%20to%20know%20if%20my%20job%20fits%20your%20services." target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_service_fit')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       👉 Not sure if your job fits? <strong>Chat with us on WhatsApp</strong> for quick confirmation.
     </a>`,
   },
@@ -80,7 +82,7 @@ export const FAQS: FAQItem[] = [
     question: 'How much does a banner cost in Lagos?',
     answer: `Pricing depends on <strong>size, material, finishing, and quantity</strong>. Once we understand your needs, we’ll send you a <strong>clear, upfront quote</strong>.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20I'd%20like%20a%20fast%20quote%20for%20a%20banner." target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_price_quote')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       💬 <strong>Send your banner size on WhatsApp</strong> and get a fast quote.
     </a>`,
   },
@@ -88,7 +90,7 @@ export const FAQS: FAQItem[] = [
     question: 'Can I get same-day printing in Lagos?',
     answer: `Yes — <strong>same-day printing is available</strong> for select jobs, depending on size, material, and production queue. If timing is critical, let us know early.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20I%20have%20an%20urgent%20job.%20Can%20you%20print%20today?" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_sameday_availability')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       ⚡ <strong>Message us on WhatsApp now</strong> to confirm availability today.
     </a>`,
   },
@@ -96,7 +98,7 @@ export const FAQS: FAQItem[] = [
     question: 'Do you deliver to Lekki, Victoria Island, or Ikeja?',
     answer: `Yes. We deliver across <strong>Lagos</strong>, including Lekki, Victoria Island, Ikeja, and nearby areas. Delivery cost and timeline are confirmed with your order.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20can%20you%20deliver%20to..." target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_delivery_location')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       📍 <strong>Send your location on WhatsApp</strong> to confirm delivery details.
     </a>`,
   },
@@ -104,7 +106,7 @@ export const FAQS: FAQItem[] = [
     question: 'What file formats do you accept?',
     answer: `We accept <strong>PDF, AI, PSD, and high-resolution JPG/PNG</strong> files. If you’re unsure whether your file is print-ready, we can check it for you.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20can%20I%20share%20my%20design%20for%20a%20quick%20check?" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_file_check')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       📎 <strong>Share your design on WhatsApp</strong> for a quick file check.
     </a>`,
   },
@@ -112,7 +114,7 @@ export const FAQS: FAQItem[] = [
     question: 'What banner sizes can you print?',
     answer: `We print <strong>custom sizes</strong>, from small promotional banners to <strong>large-scale formats</strong>. We’ll recommend the best size based on where it will be used.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20I%20need%20advice%20on%20a%20banner%20size." target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_size_advice')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       📐 <strong>Tell us where the banner will be used on WhatsApp</strong> and we’ll advise.
     </a>`,
   },
@@ -120,7 +122,7 @@ export const FAQS: FAQItem[] = [
     question: 'How long does printing take?',
     answer: `Most projects are completed within <strong>24–72 hours</strong>, depending on size and finishing. Urgent jobs can often be prioritised.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20I%20have%20a%20deadline.%20Can%20you%20confirm%20turnaround%20time?" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_turnaround')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       ⏱️ <strong>Message us on WhatsApp</strong> with your deadline to confirm turnaround.
     </a>`,
   },
@@ -128,7 +130,7 @@ export const FAQS: FAQItem[] = [
     question: 'Do you offer installation?',
     answer: `Yes. We offer <strong>professional installation</strong> for wall branding, window graphics, and large-format applications within Lagos.
     <br/><br/>
-    <a href="https://wa.me/2348022247567?text=Hi%20BOMedia,%20I'd%20like%20to%20include%20installation%20in%20my%20quote." target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
+    <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_installation_quote')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       🛠️ <strong>Chat with us on WhatsApp</strong> to include installation in your quote.
     </a>`,
   },

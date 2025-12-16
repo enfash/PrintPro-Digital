@@ -6,6 +6,12 @@ import { Menu, X, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NAV_LINKS, WHATSAPP_LINK } from '@/lib/constants';
 
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -17,6 +23,15 @@ const Header: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const handleTrackedClick = (location: string) => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'whatsapp_click', {
+        location: location,
+        page: window.location.pathname,
+      });
+    }
+  };
 
   return (
     <header
@@ -47,7 +62,11 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <Button asChild variant="outline" size="sm" className="gap-2 !border-green-600 !text-green-700 hover:!bg-green-50">
-            <Link href={WHATSAPP_LINK} target="_blank">
+            <Link 
+              href={WHATSAPP_LINK} 
+              target="_blank"
+              onClick={() => handleTrackedClick('header_whatsapp_quote')}
+            >
               <MessageCircle size={16} />
               WhatsApp Quote
             </Link>
@@ -80,7 +99,14 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <Button asChild className="mt-4 gap-2 w-full !bg-green-600 hover:!bg-green-700">
-            <Link href={WHATSAPP_LINK} target="_blank" >
+            <Link 
+              href={WHATSAPP_LINK} 
+              target="_blank" 
+              onClick={() => {
+                handleTrackedClick('header_whatsapp_quote_mobile');
+                setIsMobileMenuOpen(false);
+              }}
+            >
               <MessageCircle size={18} />
               WhatsApp Quote
             </Link>

@@ -12,6 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 import { submitContactForm } from '@/lib/actions';
 import { ACCEPTED_FILE_TYPES } from '@/lib/schema';
 
+declare global {
+  interface Window {
+    gtag: (...args: any[]) => void;
+  }
+}
+
 const initialFormState = {
   success: false,
   message: '',
@@ -40,6 +46,15 @@ const Contact: React.FC = () => {
   // We use a key to force re-mounting the form, which is the cleanest way to reset it
   const [formKey, setFormKey] = useState(Date.now());
 
+  const handleTrackedClick = (location: string) => {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'whatsapp_click', {
+        location: location,
+        page: window.location.pathname,
+      });
+    }
+  };
+
   return (
     <section id="contact" className="py-16 lg:py-24 bg-white scroll-mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -56,7 +71,11 @@ const Contact: React.FC = () => {
             <div className="space-y-6">
               <div>
                 <Button asChild size="lg" className="w-full sm:w-auto gap-2 !bg-green-600 hover:!bg-green-700">
-                  <Link href={WHATSAPP_LINK} target="_blank">
+                  <Link 
+                    href={WHATSAPP_LINK} 
+                    target="_blank"
+                    onClick={() => handleTrackedClick('contact_whatsapp')}
+                  >
                     <MessageCircle size={20} />
                     Chat on WhatsApp
                   </Link>
