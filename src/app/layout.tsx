@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { GoogleTagManager } from '@next/third-parties/google';
+import ConsentBanner from '@/components/ConsentBanner';
 
 export const metadata: Metadata = {
   title: 'Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia',
@@ -192,6 +193,7 @@ export default function RootLayout({
         <FirebaseErrorListener />
         {children}
         <Toaster />
+        <ConsentBanner />
       </body>
     </html>
   );
