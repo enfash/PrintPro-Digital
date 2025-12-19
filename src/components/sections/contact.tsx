@@ -244,30 +244,28 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   };
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    let firstInvalidField: HTMLElement | null = null;
     let isValid = true;
-
-    // Check fields in order
+    
+    // Check all required fields and shake if invalid
     if (!nameRef.current?.value) {
       isValid = false;
-      if (!firstInvalidField) firstInvalidField = nameRef.current;
+      shakeField(nameRef.current);
     }
     if (!phoneRef.current?.value) {
       isValid = false;
-      if (!firstInvalidField) firstInvalidField = phoneRef.current;
+      shakeField(phoneRef.current);
     }
     if (!jobTypeRef.current?.value) {
       isValid = false;
-      if (!firstInvalidField) firstInvalidField = jobTypeRef.current;
+      shakeField(jobTypeRef.current);
     }
     if (!messageRef.current?.value || messageRef.current.value.length < 10) {
       isValid = false;
-      if (!firstInvalidField) firstInvalidField = messageRef.current;
+      shakeField(messageRef.current);
     }
-
+    
     if (!isValid) {
-      e.preventDefault(); // Prevent form submission
-      shakeField(firstInvalidField);
+      e.preventDefault(); // Prevent form submission if any field is invalid
     }
   };
 
