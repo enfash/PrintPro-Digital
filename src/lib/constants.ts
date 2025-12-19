@@ -88,7 +88,7 @@ export const FAQS: FAQItem[] = [
   },
   {
     question: 'Can I get same-day printing in Lagos?',
-    answer: `Yes — <strong>same-day printing is available</strong> for select jobs, depending on size, material, and production queue. If timing is critical, let us know early.
+    answer: `Yes - <strong>same-day printing is available</strong> for select jobs, depending on size, material, and production queue. If timing is critical, let us know early.
     <br/><br/>
     <a href="${WHATSAPP_LINK}" onclick="${gtag('faq_sameday_availability')}" target="_blank" rel="noopener noreferrer" style="color: #4659cd; font-weight: 500;">
       ⚡ <strong>Message us on WhatsApp now</strong> to confirm availability today.

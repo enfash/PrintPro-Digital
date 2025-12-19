@@ -40,12 +40,12 @@ export default function NotFound() {
 
           {/* Headline */}
           <h2 className="mt-4 text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-            This page isn’t available — but we can still help you print.
+            This page isn’t available - but we can still help you print.
           </h2>
           
           {/* Subtext */}
           <p className="mt-4 text-slate-600 max-w-xl mx-auto text-lg">
-            Large-format printing, banners, stickers, and branded materials —
+            Large-format printing, banners, stickers, and branded materials -
             <br className="hidden sm:block" />
             <span className="font-medium text-slate-700">produced fast and delivered across Lagos.</span>
           </p>
