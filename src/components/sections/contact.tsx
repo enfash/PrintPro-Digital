@@ -120,6 +120,10 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Create refs for all required fields
+  const nameRef = useRef<HTMLInputElement>(null);
+  const phoneRef = useRef<HTMLInputElement>(null);
   const jobTypeRef = useRef<HTMLSelectElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
 
@@ -193,16 +197,19 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     }
   };
 
+  const shakeField = (el: HTMLElement | null) => {
+    if (!el) return;
+    el.classList.add('animate-shake');
+    el.focus();
+    setTimeout(() => {
+      el.classList.remove('animate-shake');
+    }, 500);
+  };
+
   const handleSuggestion = () => {
     const jobTypeEl = jobTypeRef.current;
-    if (!jobTypeEl) return;
-
-    if (!jobTypeEl.value) {
-      jobTypeEl.classList.add('animate-shake');
-      jobTypeEl.focus();
-      setTimeout(() => {
-        jobTypeEl.classList.remove('animate-shake');
-      }, 500);
+    if (!jobTypeEl || !jobTypeEl.value) {
+      shakeField(jobTypeEl);
       return;
     }
     
@@ -236,6 +243,34 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     }
   };
 
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    let firstInvalidField: HTMLElement | null = null;
+    let isValid = true;
+
+    // Check fields in order
+    if (!nameRef.current?.value) {
+      isValid = false;
+      if (!firstInvalidField) firstInvalidField = nameRef.current;
+    }
+    if (!phoneRef.current?.value) {
+      isValid = false;
+      if (!firstInvalidField) firstInvalidField = phoneRef.current;
+    }
+    if (!jobTypeRef.current?.value) {
+      isValid = false;
+      if (!firstInvalidField) firstInvalidField = jobTypeRef.current;
+    }
+    if (!messageRef.current?.value || messageRef.current.value.length < 10) {
+      isValid = false;
+      if (!firstInvalidField) firstInvalidField = messageRef.current;
+    }
+
+    if (!isValid) {
+      e.preventDefault(); // Prevent form submission
+      shakeField(firstInvalidField);
+    }
+  };
+
   return (
     <TooltipProvider>
       <div className="bg-slate-50 rounded-3xl p-8 lg:p-10 border border-slate-100 shadow-sm relative overflow-hidden flex flex-col justify-center min-h-[660px]">
@@ -253,16 +288,16 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             </Button>
           </div>
         ) : (
-          <form ref={formRef} action={formAction} className="space-y-4">
+          <form ref={formRef} action={formAction} onSubmit={handleFormSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label htmlFor="name" className="text-sm font-medium text-slate-700">Name <span className="text-red-500">*</span></label>
-                <input name="name" id="name" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="Your name" />
+                <input ref={nameRef} name="name" id="name" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="Your name" />
                 {state.errors?.name && <p className="text-xs text-red-600">{state.errors.name[0]}</p>}
               </div>
               <div className="space-y-1.5">
                 <label htmlFor="phone" className="text-sm font-medium text-slate-700">Phone <span className="text-red-500">*</span></label>
-                <input name="phone" id="phone" type="tel" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="080..." />
+                <input ref={phoneRef} name="phone" id="phone" type="tel" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all" placeholder="080..." />
                 {state.errors?.phone && <p className="text-xs text-red-600">{state.errors.phone[0]}</p>}
               </div>
             </div>
