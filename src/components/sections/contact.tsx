@@ -38,7 +38,7 @@ function SubmitButton() {
           Sending...
         </>
       ) : (
-        'Get Price'
+        'Get a Quote'
       )}
     </Button>
   );
@@ -158,15 +158,13 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
         const largeFileWhatsappLink = `https://wa.me/2348022247567?text=${encodeURIComponent(`Hi BOMedia, I'm trying to send a large file (${(selectedFile.size / 1024 / 1024).toFixed(1)}MB) for my order.`)}`;
         
         toast({
-          title: "File Size Notice",
+          title: "File size limit exceeded",
           description: (
             <div className="flex flex-col gap-2">
                 <p>
-                  This file is larger than the 25MB upload limit. You can continue submitting the form and then send the file separately.
+                  Uploads are limited to <strong>25MB</strong>. Please send larger files via <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="text-primary-600 underline font-medium">WhatsApp</a> or WeTransfer, then share the link in the message box.
                 </p>
-                <p className='font-medium'>
-                  Please <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">send it on WhatsApp</a> or use a service like WeTransfer and paste the link in the message box.
-                </p>
+                <p className="text-xs text-slate-500">You can still submit your request.</p>
             </div>
           ),
           duration: 10000,
@@ -200,7 +198,6 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const shakeField = (el: HTMLElement | null) => {
     if (!el) return;
     el.classList.add('animate-shake');
-    el.focus();
     setTimeout(() => {
       el.classList.remove('animate-shake');
     }, 500);
@@ -210,6 +207,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     const jobTypeEl = jobTypeRef.current;
     if (!jobTypeEl || !jobTypeEl.value) {
       shakeField(jobTypeEl);
+      if (jobTypeEl) jobTypeEl.focus();
       return;
     }
     
@@ -245,27 +243,28 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 
   const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     let isValid = true;
+    let firstInvalidField: HTMLElement | null = null;
     
-    // Check all required fields and shake if invalid
-    if (!nameRef.current?.value) {
-      isValid = false;
-      shakeField(nameRef.current);
-    }
-    if (!phoneRef.current?.value) {
-      isValid = false;
-      shakeField(phoneRef.current);
-    }
-    if (!jobTypeRef.current?.value) {
-      isValid = false;
-      shakeField(jobTypeRef.current);
-    }
-    if (!messageRef.current?.value || messageRef.current.value.length < 10) {
-      isValid = false;
-      shakeField(messageRef.current);
-    }
+    const fieldsToValidate = [
+      { ref: nameRef, condition: !nameRef.current?.value },
+      { ref: phoneRef, condition: !phoneRef.current?.value },
+      { ref: jobTypeRef, condition: !jobTypeRef.current?.value },
+      { ref: messageRef, condition: !messageRef.current?.value || messageRef.current.value.length < 10 }
+    ];
+
+    fieldsToValidate.forEach(field => {
+      if (field.condition) {
+        isValid = false;
+        shakeField(field.ref.current);
+        if (!firstInvalidField) {
+            firstInvalidField = field.ref.current;
+        }
+      }
+    });
     
     if (!isValid) {
-      e.preventDefault(); // Prevent form submission if any field is invalid
+      e.preventDefault(); // Prevent form submission
+      firstInvalidField?.focus();
     }
   };
 
@@ -277,9 +276,9 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-6">
                 <CheckCircle size={32} />
             </div>
-            <h3 className="text-2xl font-bold text-slate-900 mb-2">Request Sent!</h3>
+            <h3 className="text-2xl font-bold text-slate-900 mb-2">Request sent</h3>
             <p className="text-slate-600 mb-6 max-w-sm">
-                We have received your details. Our team will review and send you a price shortly.
+                We’ll review your details and get back to you shortly.
             </p>
             <Button onClick={onReset} variant="outline">
                 Send another request
@@ -380,7 +379,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             <SubmitButton />
 
             <p className="text-xs text-slate-500 text-center pt-2">
-              We’ll never share your details with third parties. See our <Link href="/privacy-policy" className="underline">Privacy Policy</Link>.
+              We’ll review your details and respond shortly. See our <Link href="/privacy-policy" className="underline">Privacy Policy</Link>.
             </p>
           </form>
         )}
