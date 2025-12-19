@@ -38,7 +38,7 @@ const prompt = ai.definePrompt({
   Generate a template that includes fields for:
   - Size (width × height)
   - Quantity
-  - Material / finishing (e.g. eyelets, lamination)
+  - Need Eyelets?: Yes
   - Installation needed? (Yes / No)
   - Deadline
   - Delivery location (optional)
@@ -51,7 +51,7 @@ const prompt = ai.definePrompt({
 
 Size (width × height):
 Quantity:
-Material / finishing (e.g. eyelets, lamination):
+Need Eyelets?: Yes
 Installation needed? (Yes / No):
 Deadline:
 Delivery location (optional):
