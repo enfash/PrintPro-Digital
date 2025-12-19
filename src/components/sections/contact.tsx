@@ -120,6 +120,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const jobTypeRef = useRef<HTMLSelectElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -180,21 +181,20 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   };
 
   const handleSuggestion = () => {
-    startTransition(async () => {
-      const form = formRef.current;
-      if (!form) return;
+    const jobTypeEl = jobTypeRef.current;
+    if (!jobTypeEl) return;
 
-      const formData = new FormData(form);
-      const jobType = formData.get('jobType') as string;
-      
-      if (!jobType) {
-        toast({
-          variant: "destructive",
-          title: "Please select a job type",
-          description: "We need the job type to suggest a message.",
-        });
-        return;
-      }
+    if (!jobTypeEl.value) {
+      jobTypeEl.classList.add('animate-shake');
+      jobTypeEl.focus();
+      setTimeout(() => {
+        jobTypeEl.classList.remove('animate-shake');
+      }, 500);
+      return;
+    }
+    
+    startTransition(async () => {
+      const jobType = jobTypeEl.value;
       
       try {
         const result = await suggestOrderTemplate({ jobType });
@@ -262,7 +262,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 
             <div className="space-y-1.5">
               <label htmlFor="jobType" className="text-sm font-medium text-slate-700">Job Type <span className="text-red-500">*</span></label>
-              <select name="jobType" id="jobType" defaultValue="" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
+              <select ref={jobTypeRef} name="jobType" id="jobType" defaultValue="" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
                 <option value="" disabled>Select a job type</option>
                 <option>Flex Banner</option>
                 <option>Self-Adhesive Vinyl (SAV)</option>
