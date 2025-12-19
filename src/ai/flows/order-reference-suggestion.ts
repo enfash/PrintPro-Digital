@@ -32,28 +32,31 @@ const prompt = ai.definePrompt({
   output: {schema: OrderTemplateSuggestionOutputSchema},
   prompt: `You are an AI assistant for a printing company. Your task is to generate a helpful message template for a customer based on the job type they have selected.
   The template should guide the user to provide all the necessary information for an accurate price quote.
-  Use clear placeholders like [Please specify...].
 
   Job Type: {{{jobType}}}
 
   Generate a template that includes fields for:
-  - Size (width and height)
+  - Size (width × height)
   - Quantity
-  - Finishing (e.g., eyelets, lamination, etc., if applicable to the job type)
+  - Material / finishing (e.g. eyelets, lamination)
+  - Installation needed? (Yes / No)
   - Deadline
-  - Any other relevant notes.
+  - Delivery location (optional)
+  - Additional notes
 
   Start the message with "Hi, I need a {{{jobType}}}."
 
   Example for "Flex Banner":
-  "Hi, I need a Flex Banner.
+"Hi, I need a Flex Banner.
 
-  **Size:** [Please specify width and height]
-  **Quantity:** [e.g., 1 banner]
-  **Finishing:** [e.g., with eyelets]
-  **Deadline:** [e.g., by this Friday]
+Size (width × height):
+Quantity:
+Material / finishing (e.g. eyelets, lamination):
+Installation needed? (Yes / No):
+Deadline:
+Delivery location (optional):
 
-  **Additional Notes:** [Your notes here]"
+Additional notes:"
   `,
 });
 
