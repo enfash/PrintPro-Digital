@@ -51,7 +51,7 @@ const HowItWorks: React.FC = () => {
             {TIMELINE_STEPS.map((step, index) => (
               <div 
                 key={step.id} 
-                className={`relative flex md:flex-col md:items-center md:text-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
+                className={`group relative flex md:flex-col md:items-center md:text-center transition-all duration-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'}`}
                 style={{ transitionDelay: `${index * 200}ms` }}
               >
                 {/* Mobile Connecting Line */}
@@ -60,7 +60,7 @@ const HowItWorks: React.FC = () => {
                 )}
 
                 <div className="flex-shrink-0 mb-4 md:mb-0">
-                  <div className="relative z-10 w-16 h-16 bg-white border-4 border-slate-50 rounded-full flex items-center justify-center text-primary-600 shadow-md">
+                  <div className="relative z-10 w-16 h-16 bg-white border-4 border-slate-50 rounded-full flex items-center justify-center text-primary-600 shadow-md group-hover:bg-primary-600 group-hover:text-white group-hover:border-primary-100 transition-colors duration-300">
                       {React.createElement(step.icon, { className: "w-8 h-8" })}
                   </div>
                 </div>
