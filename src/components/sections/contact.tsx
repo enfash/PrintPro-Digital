@@ -3,7 +3,7 @@
 
 import React, { useState, useRef, useEffect, useActionState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle } from 'lucide-react';
+import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
@@ -152,25 +152,27 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 
       if (selectedFile.size > MAX_FILE_SIZE) {
         const largeFileWhatsappLink = `https://wa.me/2348022247567?text=${encodeURIComponent(`Hi BOMedia, I'm trying to send a large file (${(selectedFile.size / 1024 / 1024).toFixed(1)}MB) for my order.`)}`;
-
+        
         toast({
-          variant: "destructive",
-          title: "File is too large",
+          title: "File Size Notice",
           description: (
-            <div>
-              Your file is larger than 25MB. Please{' '}
-              <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="underline font-bold">
-                send it on WhatsApp
-              </a>{' '}
-              or upload to WeTransfer and share the link in the message box.
+            <div className="flex flex-col gap-2">
+                <p>
+                  This file is larger than the 25MB upload limit. You can continue submitting the form and then send the file separately.
+                </p>
+                <p className='font-medium'>
+                  Please <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="text-primary-600 underline">send it on WhatsApp</a> or use a service like WeTransfer and paste the link in the message box.
+                </p>
             </div>
           ),
           duration: 10000,
         });
 
+        // Clear the file input but allow the form to be submitted.
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
+        setFile(null);
         return;
       }
 
