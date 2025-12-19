@@ -101,6 +101,10 @@ export default {
           '0%': { 'box-shadow': 'none' },
           '100%': { 'box-shadow': '0 0 0 2px hsl(var(--destructive))' },
         },
+        'subtle-pulse': {
+          '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.02)', opacity: '0.95' },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -108,6 +112,7 @@ export default {
         'bounce-in': 'bounce-in 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
         'slide-up-fast': 'slide-up-fast 0.3s ease-out forwards',
         'shake': 'shake 0.5s ease-in-out',
+        'subtle-pulse': 'subtle-pulse 5s ease-in-out infinite',
       },
     },
   },
