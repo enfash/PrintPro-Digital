@@ -7,6 +7,7 @@ interface EmailTemplateProps {
   message: string;
   fileName?: string;
   fileSize?: number;
+  fileUrl?: string; // Added fileUrl
   agreeToUpdates: boolean;
 }
 
@@ -18,6 +19,7 @@ export function generateAdminEmailHTML({
   message,
   fileName,
   fileSize,
+  fileUrl, // Destructure fileUrl
   agreeToUpdates,
 }: EmailTemplateProps): string {
   return `
@@ -102,9 +104,14 @@ export function generateAdminEmailHTML({
               <!-- Artwork -->
               <div style="margin-bottom:20px;">
                 <p style="margin:0; font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">ARTWORK</p>
-                <p style="margin:6px 0 0; font-size:14px; color:#2563eb; font-weight:500;">
-                  📎 ${fileName} ${fileSize ? `(${(fileSize / 1024 / 1024).toFixed(2)} MB)` : ''}
+                <p style="margin:6px 0 0; font-size:14px; color:#374151;">
+                  ${fileName} ${fileSize ? `(${(fileSize / 1024 / 1024).toFixed(2)} MB)` : ''}
                 </p>
+                ${fileUrl ? `
+                <a href="${fileUrl}" target="_blank" style="display: inline-block; margin-top: 8px; padding: 8px 16px; background-color: #4659cd; color: #ffffff; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600;">
+                  Download Artwork
+                </a>
+                ` : ''}
               </div>
               ` : ''}
 

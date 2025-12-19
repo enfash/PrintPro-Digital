@@ -105,13 +105,12 @@ export async function submitContactForm(
   let fileUrl: string | null = null;
   let fileName: string | null = null;
   let fileSize: number | null = null;
-  let fileBuffer: Buffer | null = null;
 
   if (file && file.size > 0) {
     fileName = file.name;
     fileSize = file.size;
     const arrayBuffer = await file.arrayBuffer();
-    fileBuffer = Buffer.from(arrayBuffer);
+    const fileBuffer = Buffer.from(arrayBuffer);
 
     if (!adminApp) {
       console.error('Firebase Admin is not initialized. Cannot upload file.');
@@ -129,6 +128,7 @@ export async function submitContactForm(
         metadata: { contentType: file.type },
       });
       
+      // Make the file public to get a downloadable URL
       await fileRef.makePublic();
       fileUrl = fileRef.publicUrl();
 
@@ -161,17 +161,16 @@ export async function submitContactForm(
         name, phone, email, jobType, message,
         fileName: fileName || undefined,
         fileSize: fileSize || undefined,
+        fileUrl: fileUrl || undefined, // Pass the URL to the email template
         agreeToUpdates: validatedFields.data.agreeToTerms,
       });
 
-      const attachments = fileBuffer && fileName ? [{ filename: fileName, content: fileBuffer }] : [];
-
+      // No longer sending attachments
       await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL,
         to: process.env.RESEND_TO_EMAIL,
         subject: `[#${refId}] New Order: ${jobType} - ${name}`,
         html: adminEmailHTML,
-        attachments,
       });
 
       if (email) {
