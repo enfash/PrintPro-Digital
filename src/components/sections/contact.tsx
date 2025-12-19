@@ -61,8 +61,9 @@ const Contact: React.FC = () => {
         <div className="grid lg:grid-cols-2 gap-16">
           <div>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
+              <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
                 Start your order
+                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
               </h2>
               <p className="text-lg text-slate-600">
                 Send us your artwork and details. We will reply fast with a price.

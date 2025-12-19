@@ -49,8 +49,9 @@ const Gallery: React.FC = () => {
         <div className="container mx-auto px-6">
           <div className="mb-12 flex justify-between items-end">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
+              <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
                 Recent prints
+                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
               </h2>
               <p className="text-lg text-slate-600">Some of our work around Lagos.</p>
             </div>
@@ -158,4 +159,5 @@ const Gallery: React.FC = () => {
 };
 
 export default Gallery;
+
 
