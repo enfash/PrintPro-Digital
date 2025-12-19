@@ -12,9 +12,9 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
           {/* Brand Section */}
-          <div className="text-center md:text-left">
-             <div className="flex items-center justify-center md:justify-start space-x-2 mb-2">
-              <div className="h-8 w-8">
+          <div className="md:col-span-1">
+             <div className="flex items-center space-x-2 mb-4">
+              <div className="h-8 w-8 flex-shrink-0">
                 <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 40 40">
                   <rect style={{fill: '#2e388d'}} x="0" y="0" width="40" height="40" rx="4.48" ry="4.48"/>
                   <g>
@@ -28,14 +28,16 @@ const Footer: React.FC = () => {
                   </g>
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white">Broad Options Media - BOMedia</h3>
+              <h3 className="text-xl font-bold text-white">Broad Options Media – BOMedia</h3>
             </div>
-            <p className="text-sm">Large-format printing for Lagos businesses.</p>
-            <p className="text-xs text-slate-500 mt-2">BN7243402</p>
+            <p className="text-sm leading-relaxed mb-4">
+              We help Lagos brands and organisations produce high-quality large-format prints with fast turnaround and consistent results.
+            </p>
+            <p className="text-xs text-slate-500">BN7243402</p>
           </div>
 
           {/* Service Areas */}
-          <div className="text-center md:text-left">
+          <div>
             <h4 className="text-white font-semibold mb-3">Service Areas</h4>
             <p className="text-sm leading-relaxed">
               We deliver printed materials across Lagos, including Lekki, Victoria Island, Ikeja, Yaba, Surulere, and nearby areas.
@@ -43,14 +45,14 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Connect With Us */}
-          <div className="text-center md:text-left">
+          <div>
             <h4 className="text-white font-semibold mb-3">Connect With Us</h4>
             <div className="space-y-2 text-sm">
               <a
                 href="https://www.facebook.com/bomedia03"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center md:justify-start gap-2 hover:text-white transition-colors"
+                className="flex items-center gap-2 hover:text-white transition-colors"
                 aria-label="Facebook"
               >
                 <Facebook className="w-4 h-4" />
@@ -60,27 +62,32 @@ const Footer: React.FC = () => {
                 href="https://www.instagram.com/bomedia03"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center md:justify-start gap-2 hover:text-white transition-colors"
+                className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Instagram className="w-4 h-4" />
                 Instagram
               </a>
               <a
                 href="mailto:info@bomedia.com.ng"
-                className="flex items-center justify-center md:justify-start gap-2 hover:text-white transition-colors"
+                className="flex items-center gap-2 hover:text-white transition-colors"
               >
                 <Mail className="w-4 h-4" />
                 info@bomedia.com.ng
               </a>
-              <div className="flex items-center justify-center md:justify-start gap-2">
+              <a
+                href="https://www.google.com/maps/search/?api=1&query=Lagos+Nigeria"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 hover:text-white transition-colors"
+              >
                 <MapPin className="w-4 h-4" />
                 Lagos, Nigeria
-              </div>
+              </a>
             </div>
           </div>
 
           {/* Legal Links */}
-          <div className="text-center md:text-left">
+          <div>
             <h4 className="text-white font-semibold mb-3">Legal</h4>
             <div className="space-y-2 text-sm">
               <Link href="/privacy-policy" className="block hover:text-white transition-colors">Privacy Policy</Link>
@@ -100,3 +107,5 @@ const Footer: React.FC = () => {
 };
 
 export default Footer;
+
+    
