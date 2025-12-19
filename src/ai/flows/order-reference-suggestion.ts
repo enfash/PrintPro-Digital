@@ -31,23 +31,11 @@ const prompt = ai.definePrompt({
   input: {schema: OrderTemplateSuggestionInputSchema},
   output: {schema: OrderTemplateSuggestionOutputSchema},
   prompt: `You are an AI assistant for a printing company. Your task is to generate a helpful message template for a customer based on the job type they have selected.
-  The template should guide the user to provide all the necessary information for an accurate price quote.
+  The template must be formatted with each item on a new line.
 
   Job Type: {{{jobType}}}
 
-  Generate a template that includes fields for:
-  - Size (width × height)
-  - Quantity
-  - Installation needed? (Yes / No)
-  - Deadline
-  - Delivery location (optional)
-  - Additional notes
-
-  If the job type is 'Flex Banner', you MUST also include a line "Need Eyelets?: Yes" because this is a very common requirement for banners. For all other job types, DO NOT include the eyelets line.
-
-  Start the message with "Hi, I need a {{{jobType}}}."
-
-  Example for "Flex Banner":
+  If the job type is 'Flex Banner', you MUST generate the following template exactly as it appears, with each item on a new line:
 "Hi, I need a Flex Banner.
 
 Size (width × height):
@@ -59,8 +47,8 @@ Delivery location (optional):
 
 Additional notes:"
 
-Example for "Self-Adhesive Vinyl (SAV)":
-"Hi, I need a Self-Adhesive Vinyl (SAV).
+  If the job type is anything other than 'Flex Banner' (e.g., 'Self-Adhesive Vinyl (SAV)'), you MUST generate the following template exactly as it appears, with each item on a new line:
+"Hi, I need a {{{jobType}}}.
 
 Size (width × height):
 Quantity:
