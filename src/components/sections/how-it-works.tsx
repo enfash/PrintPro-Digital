@@ -34,8 +34,9 @@ const HowItWorks: React.FC = () => {
     <section id="how-it-works" className="py-16 lg:py-24 bg-slate-50 scroll-mt-16">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
             How It Works
+            <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
           </h2>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
             A simple, 3-step process to get your prints delivered fast.
