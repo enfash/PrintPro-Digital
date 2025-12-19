@@ -38,11 +38,12 @@ const prompt = ai.definePrompt({
   Generate a template that includes fields for:
   - Size (width × height)
   - Quantity
-  - Need Eyelets?: Yes
   - Installation needed? (Yes / No)
   - Deadline
   - Delivery location (optional)
   - Additional notes
+
+  If the job type is 'Flex Banner', you MUST also include a line "Need Eyelets?: Yes" because this is a very common requirement for banners. For all other job types, DO NOT include the eyelets line.
 
   Start the message with "Hi, I need a {{{jobType}}}."
 
@@ -52,6 +53,17 @@ const prompt = ai.definePrompt({
 Size (width × height):
 Quantity:
 Need Eyelets?: Yes
+Installation needed? (Yes / No):
+Deadline:
+Delivery location (optional):
+
+Additional notes:"
+
+Example for "Self-Adhesive Vinyl (SAV)":
+"Hi, I need a Self-Adhesive Vinyl (SAV).
+
+Size (width × height):
+Quantity:
 Installation needed? (Yes / No):
 Deadline:
 Delivery location (optional):
