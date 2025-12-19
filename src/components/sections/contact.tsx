@@ -1,9 +1,9 @@
 
 'use client';
 
-import React, { useState, useRef, useEffect, useActionState } from 'react';
+import React, { useState, useRef, useEffect, useActionState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck } from 'lucide-react';
+import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
@@ -11,6 +11,9 @@ import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 import { submitContactForm } from '@/lib/actions';
 import { ACCEPTED_FILE_TYPES } from '@/lib/schema';
+import { suggestOrderTemplate } from '@/ai/flows/order-reference-suggestion';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
 
 declare global {
   interface Window {
@@ -117,9 +120,12 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const messageRef = useRef<HTMLTextAreaElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
 
   useEffect(() => {
     if (state.success) {
@@ -173,6 +179,42 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     }
   };
 
+  const handleSuggestion = () => {
+    startTransition(async () => {
+      const form = formRef.current;
+      if (!form) return;
+
+      const formData = new FormData(form);
+      const jobType = formData.get('jobType') as string;
+      
+      if (!jobType) {
+        toast({
+          variant: "destructive",
+          title: "Please select a job type",
+          description: "We need the job type to suggest a message.",
+        });
+        return;
+      }
+      
+      try {
+        const result = await suggestOrderTemplate({ jobType });
+        if (messageRef.current) {
+          messageRef.current.value = result.suggestedTemplate;
+          // Focus and place cursor at the end
+          messageRef.current.focus();
+          messageRef.current.setSelectionRange(result.suggestedTemplate.length, result.suggestedTemplate.length);
+        }
+      } catch (error) {
+        console.error("AI suggestion failed:", error);
+        toast({
+          variant: "destructive",
+          title: "Suggestion Failed",
+          description: "Could not generate a message template at this time.",
+        });
+      }
+    });
+  };
+
   const clearFile = (e: React.MouseEvent) => {
     e.preventDefault();
     setFile(null);
@@ -182,7 +224,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   };
 
   return (
-    <>
+    <TooltipProvider>
       <div className="bg-slate-50 rounded-3xl p-8 lg:p-10 border border-slate-100 shadow-sm relative overflow-hidden flex flex-col justify-center min-h-[660px]">
         {state.success ? (
           <div className="flex flex-col items-center justify-center text-center">
@@ -220,7 +262,8 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 
             <div className="space-y-1.5">
               <label htmlFor="jobType" className="text-sm font-medium text-slate-700">Job Type <span className="text-red-500">*</span></label>
-              <select name="jobType" id="jobType" defaultValue="Flex Banner" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
+              <select name="jobType" id="jobType" defaultValue="" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
+                <option value="" disabled>Select a job type</option>
                 <option>Flex Banner</option>
                 <option>Self-Adhesive Vinyl (SAV)</option>
                 <option>Window / Clear Sticker</option>
@@ -230,8 +273,24 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="message" className="text-sm font-medium text-slate-700">Message <span className="text-red-500">*</span></label>
-              <textarea name="message" id="message" rows={4} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none" placeholder="Size, quantity, deadline, any notes..." />
+              <div className="flex justify-between items-center">
+                 <label htmlFor="message" className="text-sm font-medium text-slate-700">Message <span className="text-red-500">*</span></label>
+                 <div className="flex items-center gap-1">
+                   <Button type="button" variant="ghost" size="sm" onClick={handleSuggestion} disabled={isPending} className="text-xs text-primary-600 hover:text-primary-700 h-auto px-2 py-1">
+                     {isPending ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Sparkles className="mr-1 h-3 w-3" />}
+                     Help me write this
+                   </Button>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs text-center" side="top">
+                            <p className="text-xs">Generates a message template based on your selected job type. No personal data is used.</p>
+                        </TooltipContent>
+                    </Tooltip>
+                 </div>
+              </div>
+              <textarea ref={messageRef} name="message" id="message" rows={4} className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all resize-none" placeholder="Size, quantity, deadline, any notes..." />
               {state.errors?.message && <p className="text-xs text-red-600">{state.errors.message[0]}</p>}
             </div>
 
@@ -281,7 +340,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
         )}
       </div>
       <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />
-    </>
+    </TooltipProvider>
   );
 }
 

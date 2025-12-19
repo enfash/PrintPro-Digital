@@ -1,56 +1,67 @@
 'use server';
 
 /**
- * @fileOverview This file implements the Genkit flow for suggesting order reference names based on user input.
+ * @fileOverview This file implements the Genkit flow for suggesting a message template for an order based on the job type.
  *
- * It defines a flow that takes customer details as input and uses a language model to suggest relevant reference names for their files.
- *
- * @module OrderReferenceSuggestion
- * @exports suggestOrderReference - The main function to trigger the order reference suggestion flow.
- * @exports OrderReferenceSuggestionInput - The input type for the suggestOrderReference function.
- * @exports OrderReferenceSuggestionOutput - The output type for the suggestOrderReference function.
+ * @module OrderTemplateSuggestion
+ * @exports suggestOrderTemplate - The main function to trigger the order template suggestion flow.
+ * @exports OrderTemplateSuggestionInput - The input type for the suggestOrderTemplate function.
+ * @exports OrderTemplateSuggestionOutput - The output type for the suggestOrderTemplate function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const OrderReferenceSuggestionInputSchema = z.object({
-  customerName: z.string().describe('The name of the customer.'),
-  orderDescription: z.string().describe('A description of the order provided by the customer.'),
-  additionalNotes: z.string().optional().describe('Any additional notes or details provided by the customer.'),
+const OrderTemplateSuggestionInputSchema = z.object({
+  jobType: z.string().describe('The type of print job the customer selected.'),
 });
-export type OrderReferenceSuggestionInput = z.infer<typeof OrderReferenceSuggestionInputSchema>;
+export type OrderTemplateSuggestionInput = z.infer<typeof OrderTemplateSuggestionInputSchema>;
 
-const OrderReferenceSuggestionOutputSchema = z.object({
-  suggestedReferenceName: z.string().describe('A suggested reference name for the order files based on the provided details.'),
+const OrderTemplateSuggestionOutputSchema = z.object({
+  suggestedTemplate: z.string().describe('A suggested message template for the customer to use, with placeholders for them to fill in.'),
 });
-export type OrderReferenceSuggestionOutput = z.infer<typeof OrderReferenceSuggestionOutputSchema>;
+export type OrderTemplateSuggestionOutput = z.infer<typeof OrderTemplateSuggestionOutputSchema>;
 
-export async function suggestOrderReference(input: OrderReferenceSuggestionInput): Promise<OrderReferenceSuggestionOutput> {
-  return suggestOrderReferenceFlow(input);
+export async function suggestOrderTemplate(input: OrderTemplateSuggestionInput): Promise<OrderTemplateSuggestionOutput> {
+  return suggestOrderTemplateFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'orderReferenceSuggestionPrompt',
-  input: {schema: OrderReferenceSuggestionInputSchema},
-  output: {schema: OrderReferenceSuggestionOutputSchema},
-  prompt: `You are an AI assistant helping to suggest a reference name for a customer's order files.
-  The goal is to create a concise and relevant reference that will help in organizing and identifying the files.
-  Consider the customer's name, order description, and any additional notes to generate the most appropriate reference name.
-  The reference name should be short, descriptive, and easy to understand.
+  name: 'orderTemplateSuggestionPrompt',
+  input: {schema: OrderTemplateSuggestionInputSchema},
+  output: {schema: OrderTemplateSuggestionOutputSchema},
+  prompt: `You are an AI assistant for a printing company. Your task is to generate a helpful message template for a customer based on the job type they have selected.
+  The template should guide the user to provide all the necessary information for an accurate price quote.
+  Use clear placeholders like [Please specify...].
 
-  Customer Name: {{{customerName}}}
-  Order Description: {{{orderDescription}}}
-  Additional Notes: {{{additionalNotes}}}
+  Job Type: {{{jobType}}}
 
-  Suggested Reference Name:`,
+  Generate a template that includes fields for:
+  - Size (width and height)
+  - Quantity
+  - Finishing (e.g., eyelets, lamination, etc., if applicable to the job type)
+  - Deadline
+  - Any other relevant notes.
+
+  Start the message with "Hi, I need a {{{jobType}}}."
+
+  Example for "Flex Banner":
+  "Hi, I need a Flex Banner.
+
+  **Size:** [Please specify width and height]
+  **Quantity:** [e.g., 1 banner]
+  **Finishing:** [e.g., with eyelets]
+  **Deadline:** [e.g., by this Friday]
+
+  **Additional Notes:** [Your notes here]"
+  `,
 });
 
-const suggestOrderReferenceFlow = ai.defineFlow(
+const suggestOrderTemplateFlow = ai.defineFlow(
   {
-    name: 'suggestOrderReferenceFlow',
-    inputSchema: OrderReferenceSuggestionInputSchema,
-    outputSchema: OrderReferenceSuggestionOutputSchema,
+    name: 'suggestOrderTemplateFlow',
+    inputSchema: OrderTemplateSuggestionInputSchema,
+    outputSchema: OrderTemplateSuggestionOutputSchema,
   },
   async input => {
     const {output} = await prompt(input);
