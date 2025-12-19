@@ -7,10 +7,16 @@ import { getStorage } from 'firebase-admin/storage';
 import { Resend } from 'resend';
 import { generateAdminEmailHTML, generateCustomerEmailHTML } from '@/lib/email-template';
 import { ContactFormSchema } from '@/lib/schema';
+import { headers } from 'next/headers';
 
 // This state is shared across all invocations of the action
 let adminApp: App | null = null;
 let resend: Resend | null = null;
+
+// In-memory store for rate limiting.
+const submissionStore: Record<string, { count: number; expiry: number }> = {};
+const RATE_LIMIT_COUNT = 5;
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes in milliseconds
 
 function initializeServices() {
   if (!resend) {
@@ -80,6 +86,32 @@ export async function submitContactForm(
 ): Promise<ContactFormState> {
   
   initializeServices();
+  
+  // Rate Limiting Logic
+  const ip = headers().get('x-forwarded-for') ?? '127.0.0.1';
+  const now = Date.now();
+
+  // Clean up expired entries
+  Object.keys(submissionStore).forEach((key) => {
+    if (submissionStore[key].expiry < now) {
+      delete submissionStore[key];
+    }
+  });
+
+  const entry = submissionStore[ip] || { count: 0, expiry: now + RATE_LIMIT_WINDOW };
+  
+  if (entry.count >= RATE_LIMIT_COUNT) {
+    return {
+      success: false,
+      message: 'You have submitted too many requests. Please try again later.',
+    };
+  }
+  
+  submissionStore[ip] = {
+    count: entry.count + 1,
+    expiry: entry.expiry,
+  };
+
 
   const validatedFields = ContactFormSchema.safeParse({
     name: formData.get('name'),
@@ -149,7 +181,8 @@ export async function submitContactForm(
         submittedAt: new Date().toISOString(),
       };
       await db.collection('submissions').doc(refId).set(submissionData);
-    } catch (firestoreError: any) {
+    } catch (firestoreError: any)
+{
       console.error(`❌ Failed to save submission:`, firestoreError);
       return { success: false, message: `Failed to save your request. Please try again.` };
     }

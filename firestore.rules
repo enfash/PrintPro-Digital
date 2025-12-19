@@ -1,10 +1,22 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Submissions can only be created, not read, updated, or deleted from the client.
     match /submissions/{submissionId} {
-      allow create: if true;
       allow read, update, delete: if false;
+
+      // Allow creation only if the incoming data matches the expected structure.
+      // This is a basic "schema" validation to prevent spam and malformed data.
+      allow create: if request.resource.data.name is string &&
+                       request.resource.data.name.size() > 1 &&
+                       request.resource.data.phone is string &&
+                       request.resource.data.phone.size() > 5 &&
+                       request.resource.data.jobType is string &&
+                       request.resource.data.message is string &&
+                       request.resource.data.message.size() > 9 &&
+                       request.resource.data.submittedAt is string;
     }
   }
 }
