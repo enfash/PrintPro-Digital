@@ -151,13 +151,23 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
       const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 
       if (selectedFile.size > MAX_FILE_SIZE) {
+        const largeFileWhatsappLink = `https://wa.me/2348022247567?text=${encodeURIComponent(`Hi BOMedia, I'm trying to send a large file (${(selectedFile.size / 1024 / 1024).toFixed(1)}MB) for my order.`)}`;
+
         toast({
           variant: "destructive",
           title: "File is too large",
-          description: `Your file is larger than 25MB. Please send it on WhatsApp or upload to WeTransfer and share the link in the message box.`,
-          duration: 8000,
+          description: (
+            <div>
+              Your file is larger than 25MB. Please{' '}
+              <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="underline font-bold">
+                send it on WhatsApp
+              </a>{' '}
+              or upload to WeTransfer and share the link in the message box.
+            </div>
+          ),
+          duration: 10000,
         });
-        // Clear the input value so the large file isn't submitted
+
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }
@@ -346,5 +356,3 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 }
 
 export default Contact;
-
-    
