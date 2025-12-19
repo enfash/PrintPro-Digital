@@ -38,7 +38,7 @@ function SubmitButton() {
           Sending...
         </>
       ) : (
-        'Get a Quote'
+        'Request a Quote'
       )}
     </Button>
   );
@@ -158,9 +158,10 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
         const largeFileWhatsappLink = `https://wa.me/2348022247567?text=${encodeURIComponent(`Hi BOMedia, I'm trying to send a large file (${(selectedFile.size / 1024 / 1024).toFixed(1)}MB) for my order.`)}`;
         
         toast({
-          title: "File size limit exceeded",
+          variant: "default",
+          title: "File size notice",
           description: (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 text-foreground">
                 <p>
                   Uploads are limited to <strong>25MB</strong>. Please send larger files via <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="text-primary-600 underline font-medium">WhatsApp</a> or WeTransfer, then share the link in the message box.
                 </p>

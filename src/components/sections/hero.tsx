@@ -56,11 +56,9 @@ export default function Hero() {
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                <Button asChild size="lg">
                  <Link 
-                  href={WHATSAPP_LINK} 
-                  target="_blank"
-                  onClick={() => handleTrackedClick('hero_whatsapp_quote')}
+                  href="/#contact"
                  >
-                    Get a Quote
+                    Request a Quote
                     <ArrowRight className="w-5 h-5" />
                  </Link>
                </Button>
