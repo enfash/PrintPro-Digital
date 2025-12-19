@@ -56,7 +56,7 @@ const Services: React.FC = () => {
                   {service.title}
                 </Link>
                 
-                <p className="text-slate-600 mb-4 md:mb-6 leading-relaxed text-sm md:text-base">
+                <p className="text-slate-600 mb-4 md:mb-6 leading-relaxed text-sm md:text-base whitespace-pre-line">
                   {service.description}
                 </p>
                 
@@ -69,7 +69,7 @@ const Services: React.FC = () => {
         </div>
         <div className="text-center mt-12">
             <p className="text-slate-600 text-sm">
-                Perfect for: brand campaigns, events, retail spaces, real estate, schools, and organisations across Lagos.
+                Perfect for: brand campaigns, retail stores, offices, schools, real estate, and organisations across Lagos.
             </p>
         </div>
       </div>

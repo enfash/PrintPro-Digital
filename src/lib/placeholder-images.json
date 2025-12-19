@@ -3,7 +3,7 @@
     {
       "id": "hero-main",
       "description": "A collection of high-quality large format prints including a vibrant flex banner and detailed window graphics, representing BOMedia's services.",
-      "imageUrl": "https://images.unsplash.com/photo-1630327722923-5ebd594ddda9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxwcmludGluZyUyMHNhbXBsZXN8ZW58MHx8fHwxNzY1MjEyNTYxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "/images/hero/hero-banner.jpg",
       "imageHint": "printing samples"
     },
     {
