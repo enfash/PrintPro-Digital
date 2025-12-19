@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/layout/footer';
 import Header from '@/components/layout/header';
-import { ArrowRight, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -34,7 +34,7 @@ export default function NotFound() {
         <div className="w-full max-w-3xl animate-bounce-in">
           
           {/* 404 Code */}
-          <h1 className="text-8xl md:text-9xl font-black text-slate-200/80 tracking-tighter animate-subtle-pulse">
+          <h1 className="text-8xl md:text-9xl font-black text-slate-200/80 tracking-tighter select-none animate-subtle-pulse">
             404
           </h1>
 
@@ -52,13 +52,13 @@ export default function NotFound() {
 
           {/* Primary CTAs */}
           <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button asChild size="lg" className="w-full sm:w-auto !bg-green-600 hover:!bg-green-700">
-              <Link href={WHATSAPP_404_PREFILL} target="_blank">
+            <Button asChild size="lg" className="w-full sm:w-auto !bg-green-600 hover:!bg-green-700" id="cta-whatsapp" aria-label="Get a quote on WhatsApp">
+              <Link href={WHATSAPP_404_PREFILL} target="_blank" rel="noopener noreferrer">
                 <MessageCircle size={20} />
                 Get a Quote on WhatsApp
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto">
+            <Button asChild size="lg" variant="outline" className="w-full sm:w-auto" id="cta-browse">
               <Link href="/#services">
                 See What We Print
               </Link>
@@ -97,4 +97,3 @@ export default function NotFound() {
     </div>
   );
 }
-
