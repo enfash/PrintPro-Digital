@@ -32,11 +32,11 @@ const Services: React.FC = () => {
       <div className="container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
-            What we print
+            Large-Format Printing Services in Lagos
             <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
           </h2>
           <p className="text-lg text-slate-600">
-            Focused large-format printing for brands, shops and events in Lagos.
+            Fast, high-quality branding for shops, events, and businesses.
           </p>
         </div>
 

@@ -25,23 +25,23 @@ export const NAV_LINKS: NavItem[] = [
 export const SERVICES: ServiceItem[] = [
   {
     id: 'flex',
-    title: 'Flex Banners',
-    description: 'Large-format banners for campaigns, events, and outdoor visibility. Roll-ups, X-banners, snapper frames, teardrop flags, and backdrops.',
-    meta: 'Ready under 24 hrs',
+    title: 'Flex Banners & Event Displays',
+    description: 'Durable banners, roll-ups, and flags for outdoor campaigns.',
+    meta: 'Ready in 24 Hours',
     icon: Printer,
   },
   {
     id: 'sav',
-    title: 'Self-Adhesive Vinyl (SAV)',
-    description: 'Professional self-adhesive vinyl for interior, exterior, and campaign branding. Wall graphics, window vinyl, vehicle branding, and surface wraps.',
-    meta: 'Perfect for branding spaces',
+    title: 'Vinyl & Custom Stickers (SAV)',
+    description: 'Professional adhesive branding for walls, vehicles, and surfaces.',
+    meta: 'Interior & Exterior',
     icon: Layers,
   },
   {
     id: 'stickers',
-    title: 'Window & Clear Vinyl / Stickers',
-    description: 'Precision-printed clear vinyl for storefronts, offices, and glass branding. Logo decals, window graphics, frosted effects, and visibility control.',
-    meta: 'Professional finish, clear look',
+    title: 'Window Graphics & Decals',
+    description: 'Clear stickers, frosted glass, and storefront branding.',
+    meta: 'Professional Finish',
     icon: Scan,
   },
 ];
