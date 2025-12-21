@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useRef, useEffect, useActionState, useTransition } from 'react';
@@ -214,9 +213,10 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     
     startTransition(async () => {
       const jobType = jobTypeEl.value;
+      const customerDraft = messageRef.current?.value || '';
       
       try {
-        const result = await suggestOrderTemplate({ jobType });
+        const result = await suggestOrderTemplate({ jobType, customerDraft });
         if (messageRef.current) {
           messageRef.current.value = result.suggestedTemplate;
           // Focus and place cursor at the end
@@ -331,7 +331,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
                             <HelpCircle className="h-3 w-3 text-slate-400 cursor-help" />
                         </TooltipTrigger>
                         <TooltipContent className="max-w-xs text-center" side="top">
-                            <p className="text-xs">Generates a message template based on your selected job type. No personal data is used.</p>
+                            <p className="text-xs">Refines your message using AI based on your selected job type. No personal data is used.</p>
                         </TooltipContent>
                     </Tooltip>
                  </div>
