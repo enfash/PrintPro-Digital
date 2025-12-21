@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -45,7 +46,7 @@ const Header: React.FC = () => {
         <Link href="/" className="flex items-center gap-2 z-50">
           <img
             src="/logos/bomedia-logo.svg"
-            alt="BOMedia"
+            alt="BOMedia - Broad Options Media Logo"
             className="h-12 w-auto"
           />
         </Link>

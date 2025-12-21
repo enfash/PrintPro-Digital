@@ -50,7 +50,7 @@ export default function Hero() {
             </h1>
 
             <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              <strong>Broad Options Media (BOMedia)</strong> prints sharp, large-format banners and stickers for Lagos businesses - flex banners, self-adhesive vinyl (SAV), window graphics and wall branding - with 4-6 hour production and same-day delivery across Lagos.
+              Get sharp flex banners, SAV, and wall branding from <strong>Broad Options Media (BOMedia)</strong>. We guarantee 4-6 hour production and same-day delivery.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
