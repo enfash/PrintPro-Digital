@@ -46,7 +46,7 @@ Customer Draft: "{{{customerDraft}}}"
 Here are the standard templates to use as a base if the draft is empty:
 
 If the job type is 'Flex Banner' and the draft is empty, you MUST generate the following template exactly as it appears:
-"Hi, I need a Flex Banner.
+"Hi BOMedia, I need a Flex Banner.
 
 Size (width × height):
 Quantity:
@@ -58,7 +58,7 @@ Delivery location (optional):
 Additional notes:"
 
 If the job type is anything other than 'Flex Banner' (e.g., 'Self-Adhesive Vinyl (SAV)') and the draft is empty, you MUST generate the following template exactly as it appears:
-"Hi, I need a {{{jobType}}}.
+"Hi BOMedia, I need a {{{jobType}}}.
 
 Size (width × height):
 Quantity:
@@ -69,7 +69,7 @@ Delivery location (optional):
 Additional notes:"
 
 If the customer provides a draft like "I want to print this but I want to make sure it sharp for billboard", you should refine it to something like this (adjusting for the actual job type):
-"Hi, I need a {{{jobType}}} for a billboard.
+"Hi BOMedia, I need a {{{jobType}}} for a billboard.
 
 It's very important that the print is high-resolution and sharp.
 

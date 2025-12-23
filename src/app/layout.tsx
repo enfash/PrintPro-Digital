@@ -9,24 +9,38 @@ import ConsentBanner from '@/components/ConsentBanner';
 
 export const metadata: Metadata = {
   title: 'Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia',
-  description: 'Get sharp flex banners, SAV, and wall branding from Broad Options Media (BOMedia). We guarantee 4-6 hour production and same-day delivery.',
-  keywords: "large format printing Lagos, flex banners Nigeria, window graphics Lagos, self-adhesive vinyl Lagos, SAV printing Nigeria, clear stickers Lagos, banner printing Lagos, outdoor printing Nigeria",
+  description: 'Get sharp flex banners, SAV, and wall branding from Broad Options Media (BOMedia). We guarantee fast production and same-day delivery in Lagos.',
+  keywords: [
+    "large format printing Lagos", 
+    "flex banners Nigeria", 
+    "window graphics Lagos", 
+    "self-adhesive vinyl Lagos", 
+    "SAV printing Nigeria", 
+    "clear stickers Lagos", 
+    "banner printing Lagos", 
+    "outdoor printing Nigeria"
+  ],
   authors: [{ name: "BOMedia - Broad Options Media" }],
   robots: "index, follow",
   openGraph: {
     type: "website",
     url: "https://bomedia.com.ng/",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
-    description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
-    images: "https://bomedia.com.ng/images/hero/hero-banner.jpg",
+    description: "BOMedia provides fast, high-quality flex banners, SAV, and window graphics in Lagos. Get same-day delivery on standard jobs.",
+    images: [{
+      url: "https://bomedia.com.ng/images/hero/hero-banner.jpg",
+      width: 1200,
+      height: 630,
+      alt: "BOMedia Large Format Printing Services",
+    }],
     locale: "en_NG",
     siteName: "BOMedia Large Format Printing",
   },
   twitter: {
     card: "summary_large_image",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
-    description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
-    images: "https://bomedia.com.ng/images/hero/hero-banner.jpg",
+    description: "BOMedia provides fast, high-quality flex banners, SAV, and window graphics in Lagos. Get same-day delivery on standard jobs.",
+    images: ["https://bomedia.com.ng/images/hero/hero-banner.jpg"],
   },
 };
 
@@ -198,5 +212,7 @@ export default function RootLayout({
     </html>
   );
 }
+
+    
 
     
