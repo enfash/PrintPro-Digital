@@ -9,7 +9,7 @@ import ConsentBanner from '@/components/ConsentBanner';
 
 export const metadata: Metadata = {
   title: 'Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia',
-  description: 'Looking for fast large format printing in Lagos? BOMedia specializes in flex banners, window graphics, and SAV branding with 24-48 hour delivery. Get a quote today.',
+  description: 'Get sharp flex banners, SAV, and wall branding from Broad Options Media (BOMedia). We guarantee 4-6 hour production and same-day delivery.',
   keywords: "large format printing Lagos, flex banners Nigeria, window graphics Lagos, self-adhesive vinyl Lagos, SAV printing Nigeria, clear stickers Lagos, banner printing Lagos, outdoor printing Nigeria",
   authors: [{ name: "BOMedia - Broad Options Media" }],
   robots: "index, follow",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     url: "https://bomedia.com.ng/",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
-    images: "https://bomedia.com.ng/images/og-image.jpg",
+    images: "https://bomedia.com.ng/images/hero/hero-banner.jpg",
     locale: "en_NG",
     siteName: "BOMedia Large Format Printing",
   },
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, self-adhesive vinyl, window graphics and clear stickers for businesses in Lagos. 48-72 hour turnaround on standard jobs.",
-    images: "https://bomedia.com.ng/images/og-image.jpg",
+    images: "https://bomedia.com.ng/images/hero/hero-banner.jpg",
   },
 };
 
@@ -62,7 +62,7 @@ export default function RootLayout({
   "@type": "LocalBusiness",
   "name": "BOMedia - Broad Options Media",
   "alternateName": "BOMedia",
-  "image": "https://bomedia.com.ng/images/og-image.jpg",
+  "image": "https://bomedia.com.ng/images/hero/hero-banner.jpg",
   "@id": "https://bomedia.com.ng",
   "url": "https://bomedia.com.ng",
   "telephone": "+234-802-224-7567",
@@ -198,3 +198,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+    
