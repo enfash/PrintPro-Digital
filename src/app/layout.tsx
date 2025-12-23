@@ -53,6 +53,13 @@ export const metadata: Metadata = {
     description: "BOMedia provides fast, high-quality flex banners, SAV, and window graphics in Lagos. Get same-day delivery on standard jobs.",
     images: ["/images/hero/hero-banner.jpg"],
   },
+  icons: {
+    icon: [
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -63,11 +70,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("!scroll-smooth", inter.variable)} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
-        {/* Favicon */}
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-
         {/* Geo Tagging */}
         <meta name="geo.region" content="NG-LA" />
         <meta name="geo.placename" content="Lagos" />
@@ -84,12 +86,12 @@ export default function RootLayout({
   "image": "https://bomedia.com.ng/images/hero/hero-banner.jpg",
   "@id": "https://bomedia.com.ng",
   "url": "https://bomedia.com.ng",
-  "telephone": "+234-802-224-7567",
+  "telephone": "+2348022247567",
   "email": "info@bomedia.com.ng",
   "priceRange": "₦₦",
   "address": {
     "@type": "PostalAddress",
-    "streetAddress": "Lagos",
+    "streetAddress": "Lagos, Nigeria",
     "addressLocality": "Lagos",
     "addressRegion": "Lagos State",
     "postalCode": "",
@@ -100,19 +102,21 @@ export default function RootLayout({
     "latitude": 6.5244,
     "longitude": 3.3792
   },
-  "openingHoursSpecification": {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
-    ],
-    "opens": "09:00",
-    "closes": "18:00"
-  },
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ],
+      "opens": "09:00",
+      "closes": "18:00"
+    }
+  ],
   "sameAs": [
     "https://wa.me/2348022247567",
     "https://www.instagram.com/bomedia03",
