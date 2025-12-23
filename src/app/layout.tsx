@@ -6,8 +6,19 @@ import { Toaster } from "@/components/ui/toaster"
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { GoogleTagManager } from '@next/third-parties/google';
 import ConsentBanner from '@/components/ConsentBanner';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://bomedia.com.ng'),
+  alternates: {
+    canonical: '/',
+  },
   title: 'Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia',
   description: 'Get sharp flex banners, SAV, and wall branding from Broad Options Media (BOMedia). We guarantee fast production and same-day delivery in Lagos.',
   keywords: [
@@ -28,7 +39,7 @@ export const metadata: Metadata = {
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, SAV, and window graphics in Lagos. Get same-day delivery on standard jobs.",
     images: [{
-      url: "https://bomedia.com.ng/images/hero/hero-banner.jpg",
+      url: "/images/hero/hero-banner.jpg",
       width: 1200,
       height: 630,
       alt: "BOMedia Large Format Printing Services",
@@ -40,7 +51,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, SAV, and window graphics in Lagos. Get same-day delivery on standard jobs.",
-    images: ["https://bomedia.com.ng/images/hero/hero-banner.jpg"],
+    images: ["/images/hero/hero-banner.jpg"],
   },
 };
 
@@ -50,10 +61,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="!scroll-smooth" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="en" className={cn("!scroll-smooth", inter.variable)} suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
-        <link rel="canonical" href="https://bomedia.com.ng/" />
-        
         {/* Favicon */}
         <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -64,10 +73,6 @@ export default function RootLayout({
         <meta name="geo.placename" content="Lagos" />
         <meta name="geo.position" content="6.5244;3.3792" />
         <meta name="ICBM" content="6.5244, 3.3792" />
-
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
         {/* Structured Data (JSON-LD) */}
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: `
@@ -202,7 +207,7 @@ export default function RootLayout({
 }
 ` }} />
       </head>
-      <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", "font-body")} suppressHydrationWarning>
+      <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", inter.className)} suppressHydrationWarning>
         <GoogleTagManager gtmId="GTM-PF8CQGCX" />
         <FirebaseErrorListener />
         {children}
@@ -212,7 +217,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-    
-
-    
