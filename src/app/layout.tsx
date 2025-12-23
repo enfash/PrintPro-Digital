@@ -94,7 +94,6 @@ export default function RootLayout({
     "streetAddress": "Lagos, Nigeria",
     "addressLocality": "Lagos",
     "addressRegion": "Lagos State",
-    "postalCode": "",
     "addressCountry": "NG"
   },
   "geo": {
