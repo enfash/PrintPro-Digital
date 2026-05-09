@@ -9,12 +9,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}
-
 export default function Hero() {
   const heroImage = PlaceHolderImages.find(img => img.id === 'hero-main');
 
@@ -28,7 +22,7 @@ export default function Hero() {
   };
 
   return (
-    <div className="relative bg-slate-50 pt-32 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
+    <section className="relative bg-slate-50 pt-32 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
 
@@ -44,7 +38,7 @@ export default function Hero() {
 
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-none tracking-tighter mb-6">
               LARGE-FORMAT PRINTING <br className="hidden lg:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-800 to-primary-600">
+              <span className="text-primary-700">
                 FOR LAGOS BUSINESSES
               </span>
             </h1>
@@ -55,9 +49,7 @@ export default function Hero() {
 
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                <Button asChild size="lg">
-                 <Link 
-                  href="/#contact"
-                 >
+                 <Link href="/#contact">
                     Request a Quote
                     <ArrowRight className="w-5 h-5" />
                  </Link>
@@ -85,7 +77,7 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Hero Image - Single Static */}
+          {/* Hero Image */}
           <div className="flex-1 w-full max-w-lg lg:max-w-none">
             <div className="relative aspect-square lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
               {heroImage ? (
@@ -103,13 +95,12 @@ export default function Hero() {
                   <p className="text-slate-500">Hero image not found</p>
                 </div>
               )}
-              {/* Overlay Gradient */}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent pointer-events-none"></div>
             </div>
           </div>
 
         </div>
       </div>
-    </div>
+    </section>
   );
 }

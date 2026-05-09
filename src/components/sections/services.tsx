@@ -67,10 +67,18 @@ const Services: React.FC = () => {
             </div>
           ))}
         </div>
-        <div className="text-center mt-12">
-            <p className="text-slate-600 text-sm">
-                Perfect for: Marketing Agencies, Real Estate, Event Planners, and Retail Businesses in Lagos.
-            </p>
+        <div className="mt-12 pt-10 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div>
+            <p className="text-sm font-semibold text-slate-700 mb-1">How is pricing calculated?</p>
+            <p className="text-sm text-slate-500">Based on size, material, quantity, and finishing. Clear, upfront quotes — no hidden charges.</p>
+            <p className="text-xs text-slate-400 mt-2">Perfect for: Marketing Agencies, Real Estate, Event Planners, and Retail Businesses.</p>
+          </div>
+          <a
+            href="/#contact"
+            className="flex-shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:text-primary-700 border border-primary-200 hover:border-primary-400 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-xl transition-all"
+          >
+            Get a quote →
+          </a>
         </div>
       </div>
     </section>

@@ -4,25 +4,23 @@ import { MessageCircle } from 'lucide-react';
 import Link from 'next/link';
 import { WHATSAPP_LINK } from '@/lib/constants';
 
-declare global {
-    interface Window {
-      gtag: (...args: any[]) => void;
-    }
-}
-
 const WhatsAppFloat: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
+    // Start above the consent banner height; drop to normal position once consent is recorded
+    const [bottomClass, setBottomClass] = useState('bottom-24');
 
     useEffect(() => {
+        if (localStorage.getItem('cookie_consent') !== null) {
+            setBottomClass('bottom-6');
+        }
+
         const handleScroll = () => {
-            // Show button after scrolling 300px
             setIsVisible(window.scrollY > 300);
         };
 
         window.addEventListener('scroll', handleScroll);
-        // Set initial state
         handleScroll();
-        
+
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
@@ -41,13 +39,11 @@ const WhatsAppFloat: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => handleTrackedClick('whatsapp_float')}
-            className={`fixed bottom-6 right-6 z-50 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
+            className={`fixed ${bottomClass} right-6 z-40 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
                 }`}
             aria-label="Chat on WhatsApp"
         >
             <MessageCircle size={24} />
-
-            {/* Pulse animation ring */}
             <span className="absolute inset-0 rounded-full bg-green-600 animate-ping opacity-20"></span>
         </Link>
     );

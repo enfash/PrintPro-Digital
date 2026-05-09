@@ -23,10 +23,8 @@ const Gallery: React.FC = () => {
   const [showAllMobile, setShowAllMobile] = useState(false);
   const [previewImage, setPreviewImage] = useState<(typeof GALLERY_ITEMS)[0] | null>(null);
 
-
   const totalItems = GALLERY_ITEMS.length;
 
-  // Logic for desktop slider
   const visibleItems = [];
   for (let i = 0; i < 4; i++) {
     visibleItems.push(GALLERY_ITEMS[(startIndex + i) % totalItems]);
@@ -34,13 +32,14 @@ const Gallery: React.FC = () => {
 
   const handleNext = () => {
     setStartIndex((prev) => (prev + 1) % totalItems);
+    setActiveIndex(0);
   };
 
   const handlePrev = () => {
     setStartIndex((prev) => (prev - 1 + totalItems) % totalItems);
+    setActiveIndex(0);
   };
 
-  // Logic for mobile grid
   const mobileVisibleItems = showAllMobile ? GALLERY_ITEMS : GALLERY_ITEMS.slice(0, 6);
 
   return (
@@ -51,7 +50,7 @@ const Gallery: React.FC = () => {
             <div>
               <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
                 Recent prints
-                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-500 transition-all duration-300 group-hover:w-full rounded-full"></span>
+                <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-600 transition-all duration-300 group-hover:w-full rounded-full"></span>
               </h2>
               <p className="text-lg text-slate-600">Some of our work around Lagos.</p>
             </div>
@@ -85,6 +84,7 @@ const Gallery: React.FC = () => {
                   className={`group relative cursor-pointer overflow-hidden rounded-3xl w-full h-[min(28rem,50vh)] transition-[width] duration-500 ease-in-out ${isActive ? 'md:w-[46%]' : 'md:w-[18%]'
                     }`}
                   onMouseEnter={() => setActiveIndex(index)}
+                  onClick={() => setPreviewImage(item)}
                 >
                   <Image
                     src={item.imageUrl}
@@ -159,5 +159,3 @@ const Gallery: React.FC = () => {
 };
 
 export default Gallery;
-
-

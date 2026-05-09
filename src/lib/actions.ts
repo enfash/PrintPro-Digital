@@ -8,15 +8,16 @@ import { Resend } from 'resend';
 import { generateAdminEmailHTML, generateCustomerEmailHTML } from '@/lib/email-template';
 import { ContactFormSchema } from '@/lib/schema';
 import { headers } from 'next/headers';
+import { randomBytes } from 'crypto';
 
-// This state is shared across all invocations of the action
 let adminApp: App | null = null;
 let resend: Resend | null = null;
 
-// In-memory store for rate limiting.
-const submissionStore: Record<string, { count: number; expiry: number }> = {};
+// In-memory fallback for rate limiting when Firestore is unavailable (e.g. local dev).
+// Not shared across serverless instances — Firestore is used in production.
+const inMemoryStore: Record<string, { count: number; expiry: number }> = {};
 const RATE_LIMIT_COUNT = 5;
-const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes in milliseconds
+const RATE_LIMIT_WINDOW = 10 * 60 * 1000; // 10 minutes
 
 function initializeServices() {
   if (!resend) {
@@ -27,10 +28,8 @@ function initializeServices() {
     }
   }
 
-  if (adminApp) {
-    return;
-  }
-  
+  if (adminApp) return;
+
   const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
   const isConfigured =
     process.env.FIREBASE_PROJECT_ID &&
@@ -50,7 +49,7 @@ function initializeServices() {
       console.log('✅ Firebase Admin SDK initialized on-demand.');
     } catch (e: any) {
       console.error('❌ Failed to initialize Firebase Admin SDK:', e.message);
-      adminApp = null; // Ensure it's null on failure
+      adminApp = null;
     }
   } else if (getApps().length) {
     adminApp = getApps()[0];
@@ -59,24 +58,57 @@ function initializeServices() {
   }
 }
 
+async function isRateLimited(ip: string): Promise<boolean> {
+  // Prefer Firestore so the limit works across all serverless instances
+  if (adminApp) {
+    try {
+      const db = getFirestore(adminApp);
+      const sanitizedIp = ip.replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 128);
+      const ref = db.collection('rate_limits').doc(sanitizedIp);
+      const now = Date.now();
+
+      const limited = await db.runTransaction(async (tx) => {
+        const doc = await tx.get(ref);
+        const data = doc.data() as { count: number; windowStart: number } | undefined;
+
+        if (!data || now - data.windowStart > RATE_LIMIT_WINDOW) {
+          tx.set(ref, { count: 1, windowStart: now });
+          return false;
+        }
+        if (data.count >= RATE_LIMIT_COUNT) return true;
+        tx.update(ref, { count: data.count + 1 });
+        return false;
+      });
+
+      return limited;
+    } catch (e) {
+      console.warn('⚠️ Firestore rate limit check failed, falling back to in-memory:', e);
+    }
+  }
+
+  // In-memory fallback
+  const now = Date.now();
+  Object.keys(inMemoryStore).forEach((k) => {
+    if (inMemoryStore[k].expiry < now) delete inMemoryStore[k];
+  });
+  const entry = inMemoryStore[ip] ?? { count: 0, expiry: now + RATE_LIMIT_WINDOW };
+  if (entry.count >= RATE_LIMIT_COUNT) return true;
+  inMemoryStore[ip] = { count: entry.count + 1, expiry: entry.expiry };
+  return false;
+}
+
 type ContactFormState = {
   success: boolean;
   message: string;
-  errors?: {
-    [key: string]: string[];
-  }
-}
+  errors?: { [key: string]: string[] };
+};
 
 function getJobTypeFolder(jobType: string): string {
   switch (jobType) {
-    case 'Flex Banner':
-      return 'flex-banner';
-    case 'Self-Adhesive Vinyl (SAV)':
-      return 'sav';
-    case 'Window / Clear Sticker':
-      return 'window-clear-sticker';
-    default:
-      return 'other';
+    case 'Flex Banner': return 'flex-banner';
+    case 'Self-Adhesive Vinyl (SAV)': return 'sav';
+    case 'Window / Clear Sticker': return 'window-clear-sticker';
+    default: return 'other';
   }
 }
 
@@ -84,34 +116,17 @@ export async function submitContactForm(
   prevState: ContactFormState,
   formData: FormData
 ): Promise<ContactFormState> {
-  
+
   initializeServices();
-  
-  // Rate Limiting Logic
-  const ip = headers().get('x-forwarded-for') ?? '127.0.0.1';
-  const now = Date.now();
 
-  // Clean up expired entries
-  Object.keys(submissionStore).forEach((key) => {
-    if (submissionStore[key].expiry < now) {
-      delete submissionStore[key];
-    }
-  });
+  const ip = (await headers()).get('x-forwarded-for') ?? '127.0.0.1';
 
-  const entry = submissionStore[ip] || { count: 0, expiry: now + RATE_LIMIT_WINDOW };
-  
-  if (entry.count >= RATE_LIMIT_COUNT) {
+  if (await isRateLimited(ip)) {
     return {
       success: false,
       message: 'You have submitted too many requests. Please try again later.',
     };
   }
-  
-  submissionStore[ip] = {
-    count: entry.count + 1,
-    expiry: entry.expiry,
-  };
-
 
   const validatedFields = ContactFormSchema.safeParse({
     name: formData.get('name'),
@@ -130,11 +145,14 @@ export async function submitContactForm(
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
-  
+
   const { name, phone, email, jobType, message, file } = validatedFields.data;
-  
-  const refId = Math.random().toString(36).substring(2, 7).toUpperCase();
-  let fileUrl: string | null = null;
+
+  // Cryptographically random 6-char hex reference ID
+  const refId = randomBytes(3).toString('hex').toUpperCase();
+
+  let fileSignedUrl: string | null = null;
+  let filePath: string | null = null;
   let fileName: string | null = null;
   let fileSize: number | null = null;
 
@@ -153,16 +171,25 @@ export async function submitContactForm(
       const storage = getStorage(adminApp);
       const bucket = storage.bucket();
       const jobTypeFolder = getJobTypeFolder(jobType);
-      const filePath = `submissions/${jobTypeFolder}/${refId}-${fileName}`;
+      filePath = `submissions/${jobTypeFolder}/${refId}-${fileName}`;
       const fileRef = bucket.file(filePath);
 
       await fileRef.save(fileBuffer, {
         metadata: { contentType: file.type },
       });
-      
-      // Make the file public to get a downloadable URL
-      await fileRef.makePublic();
-      fileUrl = fileRef.publicUrl();
+
+      // Generate a 7-day signed URL for the admin email — file stays private
+      try {
+        const [signedUrl] = await fileRef.getSignedUrl({
+          action: 'read',
+          expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+        });
+        fileSignedUrl = signedUrl;
+      } catch (signedUrlError) {
+        // Requires the service account to have roles/iam.serviceAccountTokenCreator.
+        // File is uploaded but the admin email won't have a download link.
+        console.warn('⚠️ Could not generate signed URL — file uploaded but link unavailable:', signedUrlError);
+      }
 
     } catch (storageError: any) {
       console.error(`❌ Failed to upload file:`, storageError);
@@ -173,16 +200,16 @@ export async function submitContactForm(
   if (adminApp) {
     try {
       const db = getFirestore(adminApp);
-      const submissionData = {
+      await db.collection('submissions').doc(refId).set({
         refId, name, phone,
         email: email || '',
-        jobType, message, fileUrl, fileName, fileSize,
+        jobType, message,
+        filePath,     // store path so admins can retrieve the file at any time
+        fileName, fileSize,
         agreeToUpdates: validatedFields.data.agreeToTerms,
         submittedAt: new Date().toISOString(),
-      };
-      await db.collection('submissions').doc(refId).set(submissionData);
-    } catch (firestoreError: any)
-{
+      });
+    } catch (firestoreError: any) {
       console.error(`❌ Failed to save submission:`, firestoreError);
       return { success: false, message: `Failed to save your request. Please try again.` };
     }
@@ -194,11 +221,10 @@ export async function submitContactForm(
         name, phone, email, jobType, message,
         fileName: fileName || undefined,
         fileSize: fileSize || undefined,
-        fileUrl: fileUrl || undefined, // Pass the URL to the email template
+        fileUrl: fileSignedUrl || undefined,
         agreeToUpdates: validatedFields.data.agreeToTerms,
       });
 
-      // No longer sending attachments
       await resend.emails.send({
         from: process.env.RESEND_FROM_EMAIL,
         to: process.env.RESEND_TO_EMAIL,

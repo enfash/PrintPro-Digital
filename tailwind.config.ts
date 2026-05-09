@@ -2,7 +2,6 @@
 import type {Config} from 'tailwindcss';
 
 export default {
-  darkMode: ['class'],
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -36,8 +35,8 @@ export default {
           200: '#c8d3f4',
           300: '#9AA6F0',
           400: '#7891e3',
-          500: '#4659CD',
-          600: '#4659cd',
+          500: '#5e6dd8',
+          600: '#4659CD',
           700: '#3646A5',
           800: '#2b3493',
           900: '#2A3476',

@@ -14,12 +14,6 @@ import { suggestOrderTemplate } from '@/ai/flows/order-reference-suggestion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}
-
 const initialFormState = {
   success: false,
   message: '',
@@ -308,13 +302,20 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
 
             <div className="space-y-1.5">
               <label htmlFor="jobType" className="text-sm font-medium text-slate-700">Job Type <span className="text-red-500">*</span></label>
-              <select ref={jobTypeRef} name="jobType" id="jobType" defaultValue="" className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
-                <option value="" disabled>Select a job type</option>
-                <option>Flex Banner</option>
-                <option>Self-Adhesive Vinyl (SAV)</option>
-                <option>Window / Clear Sticker</option>
-                <option>Other</option>
-              </select>
+              <div className="relative">
+                <select ref={jobTypeRef} name="jobType" id="jobType" defaultValue="" className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
+                  <option value="" disabled>Select a job type</option>
+                  <option>Flex Banner</option>
+                  <option>Self-Adhesive Vinyl (SAV)</option>
+                  <option>Window / Clear Sticker</option>
+                  <option>Other</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
+                  <svg className="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
               {state.errors?.jobType && <p className="text-xs text-red-600">{state.errors.jobType[0]}</p>}
             </div>
 

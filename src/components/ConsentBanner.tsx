@@ -4,14 +4,6 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
-declare global {
-  interface Window {
-    dataLayer: any[];
-    gtag: (...args: any[]) => void;
-  }
-}
-
-// Function to set the default consent state
 function gtag(...args: any[]) {
   window.dataLayer.push(arguments);
 }
@@ -20,20 +12,16 @@ export default function ConsentBanner() {
   const [showBanner, setShowBanner] = useState(false);
 
   useEffect(() => {
-    // Set default consent to 'denied' as soon as the script loads
-    // This is crucial for Google Consent Mode v2
     gtag('consent', 'default', {
       'ad_storage': 'denied',
       'analytics_storage': 'denied',
-      'wait_for_update': 500, // Wait 500ms for consent update
+      'wait_for_update': 500,
     });
 
     const consent = localStorage.getItem('cookie_consent');
     if (consent === null) {
-      // If no consent has been given, show the banner
       setShowBanner(true);
     } else if (consent === 'granted') {
-      // If consent was previously granted, update the consent state
       gtag('consent', 'update', {
         'ad_storage': 'granted',
         'analytics_storage': 'granted',
@@ -42,7 +30,6 @@ export default function ConsentBanner() {
   }, []);
 
   const handleAccept = () => {
-    // User accepts, update the consent state
     gtag('consent', 'update', {
       'ad_storage': 'granted',
       'analytics_storage': 'granted',
@@ -52,7 +39,6 @@ export default function ConsentBanner() {
   };
 
   const handleDecline = () => {
-    // User declines, consent remains 'denied'
     localStorage.setItem('cookie_consent', 'denied');
     setShowBanner(false);
   };

@@ -3,15 +3,10 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X, MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { NAV_LINKS, WHATSAPP_LINK } from '@/lib/constants';
-
-declare global {
-  interface Window {
-    gtag: (...args: any[]) => void;
-  }
-}
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -44,10 +39,13 @@ const Header: React.FC = () => {
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 z-50">
-          <img
+          <Image
             src="/logos/bomedia-logo.svg"
             alt="BOMedia - Broad Options Media Logo"
+            width={130}
+            height={48}
             className="h-12 w-auto"
+            priority
           />
         </Link>
 
@@ -63,8 +61,8 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <Button asChild variant="outline" size="sm" className="gap-2 !border-green-600 !text-green-700 hover:!bg-green-50">
-            <Link 
-              href={WHATSAPP_LINK} 
+            <Link
+              href={WHATSAPP_LINK}
               target="_blank"
               onClick={() => handleTrackedClick('header_whatsapp_quote')}
             >
@@ -100,9 +98,9 @@ const Header: React.FC = () => {
             </Link>
           ))}
           <Button asChild className="mt-4 gap-2 w-full !bg-green-600 hover:!bg-green-700">
-            <Link 
-              href={WHATSAPP_LINK} 
-              target="_blank" 
+            <Link
+              href={WHATSAPP_LINK}
+              target="_blank"
               onClick={() => {
                 handleTrackedClick('header_whatsapp_quote_mobile');
                 setIsMobileMenuOpen(false);

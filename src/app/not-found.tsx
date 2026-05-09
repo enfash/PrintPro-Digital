@@ -87,7 +87,7 @@ export default function NotFound() {
                  ))}
              </div>
              <p className="mt-8 text-sm text-slate-500">
-                *Not sure what you’re looking for?* Tell us what you need and we’ll guide you.
+                <em>Not sure what you’re looking for?</em> Tell us what you need and we’ll guide you.
              </p>
           </div>
 
