@@ -16,6 +16,9 @@ export default {
       },
     },
     extend: {
+      spacing: {
+        '18': '4.5rem',
+      },
       fontFamily: {
         sans: ['-apple-system', 'system-ui', 'Helvetica', 'Arial', 'sans-serif'],
         headline: ['-apple-system', 'system-ui', 'Helvetica', 'Arial', 'sans-serif'],

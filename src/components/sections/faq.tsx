@@ -41,7 +41,7 @@ const FAQ: React.FC = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="py-16 lg:py-24 bg-slate-50 scroll-mt-16">
+    <section id="faq" className="py-16 lg:py-18 bg-slate-50 scroll-mt-16">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-12 inline-block relative group cursor-default">

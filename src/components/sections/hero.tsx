@@ -64,7 +64,7 @@ export default function Hero() {
             <span className="text-sm font-medium text-white">Premium Large-Format Printing</span>
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white  mb-6 animate-slide-up-fade" style={{ animationDelay: '0.4s' }}>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white  mb-3 animate-slide-up-fade" style={{ animationDelay: '0.4s' }}>
             High-Impact Visibility <br/> for Your Brand
           </h1>
 

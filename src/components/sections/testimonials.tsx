@@ -26,10 +26,10 @@ const testimonials = [
 
 export default function Testimonials() {
   return (
-    <section id="testimonials" className="py-16 lg:py-24 bg-white scroll-mt-16">
+    <section id="testimonials" className="py-16 lg:py-18 bg-white scroll-mt-16">
       <div className="container mx-auto max-w-[960px] px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-2 inline-block relative group cursor-default">
             What our clients say
             <span className="absolute -bottom-1 left-0 w-0 h-1 bg-primary-600 transition-all duration-300 group-hover:w-full rounded-full"></span>
           </h2>
