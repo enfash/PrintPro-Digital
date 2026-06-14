@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
       {/* Top Contact Bar */}
       <div className="bg-slate-50 relative">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8cc63f] via-[#00a2e8] to-[#2e388d]" />
-        <div className="container mx-auto max-w-[960px] px-6 py-6 mt-1">
+        <div className="container mx-auto max-w-[960px] px-4 py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 w-full">
             
             {/* Left Side: Avatars & Text */}
@@ -23,7 +23,7 @@ const Footer: React.FC = () => {
             </div>
 
             {/* Right Side: Contact Links */}
-            <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-3 text-slate-800 font-bold text-base">
+            <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-3 text-slate-800 font-bold text-lg">
              
               <span className="hidden lg:inline text-slate-300 font-normal">|</span>
               <a href="tel:+2348022247567" className="hover:text-[#2e388d] transition-colors">+2348022247567</a>
