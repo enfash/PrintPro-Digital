@@ -1,7 +1,10 @@
+'use client';
 
 import React from 'react';
 import { Facebook, Instagram, Mail, MapPin } from 'lucide-react';
 import Link from 'next/link';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
+import CostCalculator from '@/components/calculator/CostCalculator';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -75,7 +78,15 @@ const Footer: React.FC = () => {
             <h4 className="text-white font-semibold mb-3">Quick Links</h4>
             <div className="space-y-2 text-sm">
               <Link href="/#services" className="block hover:text-white transition-colors">What we print</Link>
-              <Link href="/cost-calculator" className="block hover:text-white transition-colors">Calculator</Link>
+              <Dialog>
+                <DialogTrigger className="block hover:text-white transition-colors text-left w-full cursor-pointer">
+                  Calculator
+                </DialogTrigger>
+                <DialogContent className="max-w-[95vw] md:max-w-4xl p-0 border-0 bg-transparent shadow-none [&>button]:hidden">
+                  <DialogTitle className="sr-only">Print Cost Calculator</DialogTitle>
+                  <CostCalculator />
+                </DialogContent>
+              </Dialog>
               <Link href="/#how-it-works" className="block hover:text-white transition-colors">How it works</Link>
               <Link href="/#gallery" className="block hover:text-white transition-colors">Gallery</Link>
               <Link href="/#faq" className="block hover:text-white transition-colors">FAQ</Link>
