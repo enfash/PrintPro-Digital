@@ -20,6 +20,10 @@ export const ContactFormSchema = z.object({
   phone: z.string().min(10, { message: "Please enter a valid phone number." }),
   email: z.string().email({ message: "Please enter a valid email." }).optional().or(z.literal('')),
   jobType: z.enum(['Flex Banner', 'Self-Adhesive Vinyl (SAV)', 'Window / Clear Sticker', 'Other']),
+  width: z.string().optional(),
+  height: z.string().optional(),
+  unit: z.enum(['ft', 'in']).optional(),
+  qty: z.string().optional(),
   message: z.string().min(10, { message: "Message must be at least 10 characters." }),
   file: z
     .any()

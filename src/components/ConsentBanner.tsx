@@ -49,7 +49,7 @@ export default function ConsentBanner() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 text-white shadow-2xl animate-slide-up-fast">
-      <div className="container mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="container mx-auto max-w-[960px] px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
         <p className="text-sm text-slate-300 text-center md:text-left">
           We use cookies to improve your experience and for analytics. By using our site, you agree to our{' '}
           <Link href="/privacy-policy" className="underline hover:text-white">

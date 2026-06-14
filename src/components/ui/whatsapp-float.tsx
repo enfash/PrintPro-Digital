@@ -7,11 +7,11 @@ import { WHATSAPP_LINK } from '@/lib/constants';
 const WhatsAppFloat: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     // Start above the consent banner height; drop to normal position once consent is recorded
-    const [bottomClass, setBottomClass] = useState('bottom-24');
+    const [bottomClass, setBottomClass] = useState('bottom-32');
 
     useEffect(() => {
         if (localStorage.getItem('cookie_consent') !== null) {
-            setBottomClass('bottom-6');
+            setBottomClass('bottom-20');
         }
 
         const handleScroll = () => {

@@ -4,6 +4,10 @@ interface EmailTemplateProps {
   phone: string;
   email?: string;
   jobType: string;
+  width?: string;
+  height?: string;
+  unit?: string;
+  qty?: string;
   message: string;
   fileName?: string;
   fileSize?: number;
@@ -16,6 +20,10 @@ export function generateAdminEmailHTML({
   phone,
   email,
   jobType,
+  width,
+  height,
+  unit,
+  qty,
   message,
   fileName,
   fileSize,
@@ -89,6 +97,18 @@ export function generateAdminEmailHTML({
                   </span>
                 </p>
               </div>
+
+              ${width && height ? `
+              <!-- Dimensions & Qty -->
+              <div style="margin-bottom:20px;">
+                <p style="margin:0; font-size:11px; color:#6b7280; text-transform:uppercase; letter-spacing:0.5px; font-weight:600;">DIMENSIONS & QTY</p>
+                <p style="margin:6px 0 0; font-size:15px; color:#111827;">
+                  Size: ${width}${unit} x ${height}${unit}
+                  <br/>
+                  Quantity: ${qty || 1}
+                </p>
+              </div>
+              ` : ''}
 
               <!-- Message -->
               <div style="margin-bottom:20px;">

@@ -6,13 +6,6 @@ import { Toaster } from "@/components/ui/toaster"
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 import { GoogleTagManager } from '@next/third-parties/google';
 import ConsentBanner from '@/components/ConsentBanner';
-import { Inter } from 'next/font/google';
-
-const inter = Inter({ 
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://bomedia.com.ng'),
@@ -39,7 +32,7 @@ export const metadata: Metadata = {
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, SAV, and window graphics in Lagos. Get same-day delivery on standard jobs.",
     images: [{
-      url: "/images/hero/hero-banner.jpg",
+      url: "/images/hero-main/hero-banner.jpg",
       width: 1200,
       height: 630,
       alt: "BOMedia Large Format Printing Services",
@@ -51,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Large Format Printing Lagos | Flex Banners & Window Graphics | BOMedia",
     description: "BOMedia provides fast, high-quality flex banners, SAV, and window graphics in Lagos. Get same-day delivery on standard jobs.",
-    images: ["/images/hero/hero-banner.jpg"],
+    images: ["/images/hero-main/hero-banner.jpg"],
   },
   icons: {
     icon: [
@@ -62,13 +55,15 @@ export const metadata: Metadata = {
   },
 };
 
+import SmoothScrollProvider from '@/components/providers/SmoothScrollProvider';
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("!scroll-smooth", inter.variable)} suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="en" className="!scroll-smooth" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         {/* Geo Tagging */}
         <meta name="geo.region" content="NG-LA" />
@@ -83,7 +78,7 @@ export default function RootLayout({
   "@type": "LocalBusiness",
   "name": "BOMedia - Broad Options Media",
   "alternateName": "BOMedia",
-  "image": "https://bomedia.com.ng/images/hero/hero-banner.jpg",
+  "image": "https://bomedia.com.ng/images/hero-main/hero-banner.jpg",
   "@id": "https://bomedia.com.ng",
   "url": "https://bomedia.com.ng",
   "telephone": "+2348022247567",
@@ -210,10 +205,12 @@ export default function RootLayout({
 }
 ` }} />
       </head>
-      <body className={cn("bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900", inter.className)} suppressHydrationWarning>
+      <body className="bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900 font-sans" suppressHydrationWarning>
         <GoogleTagManager gtmId="GTM-PF8CQGCX" />
         <FirebaseErrorListener />
-        {children}
+        <SmoothScrollProvider>
+          {children}
+        </SmoothScrollProvider>
         <Toaster />
         <ConsentBanner />
       </body>

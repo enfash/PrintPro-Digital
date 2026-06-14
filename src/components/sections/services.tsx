@@ -4,6 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SERVICES } from '@/lib/constants';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const Services: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -29,7 +30,7 @@ const Services: React.FC = () => {
 
   return (
     <section id="services" className="py-16 lg:py-24 bg-white relative scroll-mt-16">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto max-w-[960px] px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-4 inline-block relative group cursor-default">
             Large-Format Printing Services in Lagos
@@ -44,7 +45,7 @@ const Services: React.FC = () => {
           {SERVICES.map((service, index) => (
             <div 
               key={service.id} 
-              className={`group relative p-6 sm:p-8 bg-slate-50 rounded-2xl border border-slate-100 hover:border-primary-200 hover:shadow-lg transition-all duration-300 flex flex-row md:flex-col items-start gap-5 ${isVisible ? 'animate-bounce-in' : 'opacity-0'}`}
+              className={`group relative p-6 sm:p-8 bg-slate-50 rounded-2xl border border-slate-100 hover-lift flex flex-row md:flex-col items-start gap-5 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} transition-all duration-700`}
               style={{ animationDelay: `${index * 150}ms` }}
             >
               <div className="w-12 h-12 flex-shrink-0 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary-600 md:mb-6 group-hover:bg-primary-600 group-hover:text-white transition-colors duration-300">
@@ -73,12 +74,9 @@ const Services: React.FC = () => {
             <p className="text-sm text-slate-500">Based on size, material, quantity, and finishing. Clear, upfront quotes — no hidden charges.</p>
             <p className="text-xs text-slate-400 mt-2">Perfect for: Marketing Agencies, Real Estate, Event Planners, and Retail Businesses.</p>
           </div>
-          <a
-            href="/#contact"
-            className="flex-shrink-0 inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 hover:text-primary-700 border border-primary-200 hover:border-primary-400 bg-primary-50 hover:bg-primary-100 px-4 py-2 rounded-xl transition-all"
-          >
-            Get a quote →
-          </a>
+          <Button asChild variant="outline" size="sm">
+            <Link href="/#contact">Get a quote &rarr;</Link>
+          </Button>
         </div>
       </div>
     </section>

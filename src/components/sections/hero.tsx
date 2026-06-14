@@ -1,101 +1,118 @@
-
 'use client';
 
-import React from 'react';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
-import { WHATSAPP_LINK } from '@/lib/constants';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, CheckCircle2, Clock, Sparkles, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 export default function Hero() {
-  const heroImage = PlaceHolderImages.find(img => img.id === 'hero-main');
+  // Get 4 placeholder images to use for the slider
+  const heroImages = PlaceHolderImages.filter(img => 
+    img.id === 'hero-main' || img.id.startsWith('gallery-')
+  ).slice(0, 4);
+  
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const handleTrackedClick = (location: string) => {
-    if (typeof window.gtag === 'function') {
-      window.gtag('event', 'whatsapp_click', {
-        location: location,
-        page: window.location.pathname,
-      });
-    }
-  };
+  useEffect(() => {
+    if (heroImages.length <= 1) return;
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % heroImages.length);
+    }, 6000); // Crossfade every 6 seconds
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
 
   return (
-    <section className="relative bg-slate-50 pt-32 pb-20 lg:pt-32 lg:pb-32 overflow-hidden">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-
-          {/* Text Content */}
-          <div className="flex-1 text-center lg:text-left z-10">
-            <div className="inline-flex items-center gap-2 bg-primary-50 border border-primary-100 rounded-full px-4 py-1.5 mb-8">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-500"></span>
-              </span>
-              <span className="text-sm font-medium text-primary-800">Open for orders in Lagos</span>
+    <section className="relative pt-32 pb-20 lg:pt-32 lg:pb-20 overflow-hidden flex items-center justify-center min-h-[75vh] lg:min-h-[480px] bg-slate-900">
+      
+      {/* Background Image Slider */}
+      <div className="absolute inset-0 z-0 bg-slate-900">
+        {heroImages.map((img, index) => {
+          const isActive = index === currentImageIndex;
+          return (
+            <div 
+              key={img.id} 
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${isActive ? 'opacity-100 z-0' : 'opacity-0 z-0'}`}
+            >
+              <Image
+                src={img.imageUrl}
+                alt={img.description}
+                fill
+                priority={index === 0}
+                className={`object-cover object-center transition-transform ease-linear ${isActive ? 'scale-110' : 'scale-100'}`}
+                style={{ transitionDuration: '10000ms' }}
+                sizes="100vw"
+                data-ai-hint={img.imageHint}
+              />
             </div>
+          );
+        })}
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-slate-900/75 z-10"></div>
+      </div>
 
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-none tracking-tighter mb-6">
-              LARGE-FORMAT PRINTING <br className="hidden lg:block" />
-              <span className="text-primary-700">
-                FOR LAGOS BUSINESSES
-              </span>
-            </h1>
+      <div className="container relative z-20 mx-auto max-w-[960px] px-6">
+        <div className="max-w-3xl mx-auto text-center">
 
-            <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Get sharp flex banners, SAV, and wall branding from <strong>Broad Options Media (BOMedia)</strong>. We guarantee 4-6 hour production and same-day delivery.
-            </p>
-
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-               <Button asChild size="lg">
-                 <Link href="/#contact">
-                    Request a Quote
-                    <ArrowRight className="w-5 h-5" />
-                 </Link>
-               </Button>
-               <Button asChild size="lg" variant="outline">
-                <Link href="/#gallery">
-                    View Our Work
-                </Link>
-               </Button>
-            </div>
-
-            <div className="mt-10 flex items-center justify-center lg:justify-start gap-6 text-sm text-slate-500">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary-500" />
-                <span>4-6hr Delivery</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary-500" />
-                <span>High Resolution</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary-500" />
-                <span>Lagos-Wide Delivery</span>
-              </div>
-            </div>
+          {/* Badge */}
+          <div className="inline-flex items-center gap-2 bg-slate-800/60 backdrop-blur-sm border border-slate-700/50 rounded-full px-4 py-1.5 mb-8 animate-slide-up-fade" style={{ animationDelay: '0.2s' }}>
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+            </span>
+            <span className="text-sm font-medium text-white">Premium Large-Format Printing</span>
           </div>
 
-          {/* Hero Image */}
-          <div className="flex-1 w-full max-w-lg lg:max-w-none">
-            <div className="relative aspect-square lg:aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl">
-              {heroImage ? (
-                <Image
-                  src={heroImage.imageUrl}
-                  alt={heroImage.description}
-                  fill
-                  priority
-                  className="object-cover"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  data-ai-hint={heroImage.imageHint}
-                />
-              ) : (
-                <div className="w-full h-full bg-slate-200 flex items-center justify-center">
-                  <p className="text-slate-500">Hero image not found</p>
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 to-transparent pointer-events-none"></div>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white  mb-6 animate-slide-up-fade" style={{ animationDelay: '0.4s' }}>
+            High-Impact Visibility <br/> for Your Brand
+          </h1>
+
+          <p className="text-lg md:text-xl text-white mb-10 max-w-2xl mx-auto leading-snug animate-slide-up-fade" style={{ animationDelay: '0.6s' }}>
+            <strong>Broad Option Media - BOMedia</strong> specializes in premium large-format printing and indoor/outdoor promotional branding designed to help your message stand out.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up-fade" style={{ animationDelay: '0.8s' }}>
+             <Button asChild size="lg" className="group w-full sm:w-auto h-12 px-8 text-base bg-[#2e388d] text-white hover:bg-[#434c98] transition-colors duration-300">
+               <Link href="/#contact" className="flex items-center">
+                  Request a Quote
+                  <svg 
+                    className="ml-2 w-4 h-4 overflow-visible" 
+                    viewBox="0 0 14 14" 
+                    aria-hidden="true"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <g fillRule="evenodd">
+                      <path 
+                        className="transition-all duration-300 ease-in-out origin-left scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100" 
+                        d="M0 7h7" 
+                      />
+                      <path 
+                        className="transition-all duration-300 ease-in-out group-hover:translate-x-[2px]" 
+                        d="M1 3l4 4-4 4" 
+                      />
+                    </g>
+                  </svg>
+               </Link>
+             </Button>
+          </div>
+
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-white animate-slide-up-fade" style={{ animationDelay: '1s' }}>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-white" />
+              <span>4-6hr Delivery</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-white" />
+              <span>High Resolution</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Truck className="w-4 h-4 text-white" />
+              <span>Lagos-Wide Delivery</span>
             </div>
           </div>
 

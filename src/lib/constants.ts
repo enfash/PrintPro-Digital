@@ -5,7 +5,10 @@ import {
   Scan,
   MessageSquare,
   FileCheck,
-  Truck
+  Truck,
+  Image as ImageIcon,
+  Car,
+  LayoutTemplate
 } from 'lucide-react';
 import { NavItem, ServiceItem, TimelineStep, FAQItem } from './types';
 
@@ -16,9 +19,7 @@ export const EMAIL_DISPLAY = "info@bomedia.com.ng";
 
 export const NAV_LINKS: NavItem[] = [
   { label: 'What we print', href: '/#services' },
-  { label: 'How it works', href: '/#how-it-works' },
-  { label: 'Gallery', href: '/#gallery' },
-  { label: 'FAQ', href: '/#faq' },
+  { label: 'Calculator', href: '/cost-calculator' },
   { label: 'Contact', href: '/#contact' },
 ];
 

@@ -17,8 +17,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-inter)', 'sans-serif'],
-        headline: ['var(--font-inter)', 'sans-serif'],
+        sans: ['-apple-system', 'system-ui', 'Helvetica', 'Arial', 'sans-serif'],
+        headline: ['-apple-system', 'system-ui', 'Helvetica', 'Arial', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
@@ -30,16 +30,16 @@ export default {
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
-          50: '#F0F3FC',
-          100: '#E1E7FA',
-          200: '#c8d3f4',
-          300: '#9AA6F0',
-          400: '#7891e3',
-          500: '#5e6dd8',
-          600: '#4659CD',
-          700: '#3646A5',
-          800: '#2b3493',
-          900: '#2A3476',
+          50: '#eaebf4',
+          100: '#cacee5',
+          200: '#a6aad3',
+          300: '#8387c2',
+          400: '#5f63b0',
+          500: '#4045a1',
+          600: '#2e388d',
+          700: '#262f79',
+          800: '#1d2563',
+          900: '#141b4e',
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",

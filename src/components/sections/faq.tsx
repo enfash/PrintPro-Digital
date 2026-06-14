@@ -4,6 +4,8 @@
 import React, { useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { FAQS } from '@/lib/constants';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const FAQItem: React.FC<{ question: string; answer: string; isOpen: boolean; onClick: () => void }> = ({
   question,
@@ -63,9 +65,9 @@ const FAQ: React.FC = () => {
         <div className="text-center mt-12">
             <p className="text-slate-600">
                 Have another question?{' '}
-                <a href="/#contact" className="font-medium text-primary-600 hover:text-primary-700">
-                    Contact us
-                </a>
+                <Button asChild variant="link" className="px-1 py-0 h-auto font-medium text-primary-600 hover:text-primary-700">
+                    <Link href="/#contact">Contact us</Link>
+                </Button>
             </p>
         </div>
       </div>

@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useActionState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
-import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle, Info } from 'lucide-react';
+import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle, Info, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
@@ -12,6 +12,8 @@ import { submitContactForm } from '@/lib/actions';
 import { ACCEPTED_FILE_TYPES } from '@/lib/schema';
 import { suggestOrderTemplate } from '@/ai/flows/order-reference-suggestion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
+import CostCalculator from '@/components/calculator/CostCalculator';
 
 
 const initialFormState = {
@@ -24,14 +26,37 @@ function SubmitButton() {
   const { pending } = useFormStatus();
 
   return (
-    <Button type="submit" size="lg" className="w-full" disabled={pending}>
+    <Button type="submit" size="lg" className="group w-full bg-[#2e388d] text-white hover:bg-[#434c98] transition-colors duration-300" disabled={pending}>
       {pending ? (
         <>
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
           Sending...
         </>
       ) : (
-        'Request a Quote'
+        <>
+          Request a Quote
+          <svg 
+            className="ml-2 w-4 h-4 overflow-visible" 
+            viewBox="0 0 14 14" 
+            aria-hidden="true"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <g fillRule="evenodd">
+              <path 
+                className="transition-all duration-300 ease-in-out origin-left scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-100" 
+                d="M0 7h7" 
+              />
+              <path 
+                className="transition-all duration-300 ease-in-out group-hover:translate-x-[2px]" 
+                d="M1 3l4 4-4 4" 
+              />
+            </g>
+          </svg>
+        </>
       )}
     </Button>
   );
@@ -79,10 +104,13 @@ const Contact: React.FC = () => {
                 </Button>
                 <p className="text-xs text-slate-500 mt-2 text-center sm:text-left">Available 9am–6pm, Mon–Sat</p>
               </div>
-              <div className="pt-6 border-t border-slate-100 space-y-4">
-                <div className="flex items-center gap-4 text-slate-700">
-                  <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-primary-600">
-                    <Phone size={20} />
+              <div className="pt-6 border-t border-slate-100 space-y-6">
+                
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4 text-slate-700">
+                    <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-primary-600">
+                      <Phone size={20} />
                   </div>
                   <a href={`tel:${PHONE_DISPLAY.replace(/\s/g, '')}`} className="font-medium hover:text-primary-600 transition-colors">
                     {PHONE_DISPLAY}
@@ -99,6 +127,7 @@ const Contact: React.FC = () => {
               </div>
             </div>
           </div>
+        </div>
           
           <ContactForm key={formKey} onReset={() => setFormKey(Date.now())} />
 
@@ -123,6 +152,41 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const [file, setFile] = useState<File | null>(null);
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Added state for cost calculation
+  const [selectedJob, setSelectedJob] = useState<string>('');
+  const [width, setWidth] = useState<string>('');
+  const [height, setHeight] = useState<string>('');
+  const [unit, setUnit] = useState<'ft' | 'in'>('ft');
+  const [qty, setQty] = useState<string>('1');
+
+  // Calculation Logic
+  const materialPrices: Record<string, number> = {
+    'Flex Banner': 250,
+    'Self-Adhesive Vinyl (SAV)': 300,
+  };
+
+  const calculateCost = () => {
+    if (selectedJob === 'Window / Clear Sticker' || selectedJob === 'Other') return null; // On request only
+    if (!materialPrices[selectedJob]) return null;
+
+    const w = parseFloat(width) || 0;
+    const h = parseFloat(height) || 0;
+    const q = parseInt(qty) || 1;
+
+    if (w <= 0 || h <= 0 || q <= 0) return 0;
+
+    let sqft = w * h;
+    if (unit === 'in') {
+      sqft = sqft / 144;
+    }
+
+    return sqft * materialPrices[selectedJob] * q;
+  };
+
+  const rawTotal = calculateCost();
+  const isCalculated = rawTotal !== null && rawTotal > 0;
+  const finalTotal = isCalculated && rawTotal! < 5000 ? 5000 : rawTotal;
 
 
   useEffect(() => {
@@ -247,7 +311,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
       { ref: messageRef, condition: !messageRef.current?.value || messageRef.current.value.length < 10 }
     ];
 
-    fieldsToValidate.forEach(field => {
+    for (const field of fieldsToValidate) {
       if (field.condition) {
         isValid = false;
         shakeField(field.ref.current);
@@ -255,7 +319,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             firstInvalidField = field.ref.current;
         }
       }
-    });
+    }
     
     if (!isValid) {
       e.preventDefault(); // Prevent form submission
@@ -303,7 +367,14 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
             <div className="space-y-1.5">
               <label htmlFor="jobType" className="text-sm font-medium text-slate-700">Job Type <span className="text-red-500">*</span></label>
               <div className="relative">
-                <select ref={jobTypeRef} name="jobType" id="jobType" defaultValue="" className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all">
+                <select 
+                  ref={jobTypeRef} 
+                  name="jobType" 
+                  id="jobType" 
+                  defaultValue="" 
+                  onChange={(e) => setSelectedJob(e.target.value)}
+                  className="w-full px-4 py-3 pr-10 rounded-xl border border-slate-200 bg-white appearance-none focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all"
+                >
                   <option value="" disabled>Select a job type</option>
                   <option>Flex Banner</option>
                   <option>Self-Adhesive Vinyl (SAV)</option>
@@ -318,6 +389,50 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
               </div>
               {state.errors?.jobType && <p className="text-xs text-red-600">{state.errors.jobType[0]}</p>}
             </div>
+
+            {selectedJob && (
+              <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-semibold text-slate-700">Dimensions & Quantity <span className="text-xs font-normal text-slate-500 ml-1">(Optional)</span></span>
+                  <div className="flex items-center bg-slate-200 p-0.5 rounded-md">
+                    <button type="button" onClick={() => setUnit('ft')} className={`px-3 py-1 rounded text-xs font-medium transition-all ${unit === 'ft' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}>ft</button>
+                    <button type="button" onClick={() => setUnit('in')} className={`px-3 py-1 rounded text-xs font-medium transition-all ${unit === 'in' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}>in</button>
+                  </div>
+                  <input type="hidden" name="unit" value={unit} />
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-500 font-medium">Width ({unit})</label>
+                    <input type="number" min="0" step="any" name="width" value={width} onChange={(e) => setWidth(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 outline-none" placeholder="e.g. 10" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-500 font-medium">Height ({unit})</label>
+                    <input type="number" min="0" step="any" name="height" value={height} onChange={(e) => setHeight(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 outline-none" placeholder="e.g. 8" />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-slate-500 font-medium">Quantity</label>
+                    <input type="number" min="1" name="qty" value={qty} onChange={(e) => setQty(e.target.value)} className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-white focus:ring-2 focus:ring-primary-500 outline-none" placeholder="1" />
+                  </div>
+                </div>
+
+                <div className="pt-3 border-t border-slate-200 mt-3 flex items-center justify-between">
+                  <span className="text-sm text-slate-600 font-medium">Estimated Cost:</span>
+                  {rawTotal === null ? (
+                    <span className="text-sm font-semibold text-primary-600 bg-primary-50 px-3 py-1 rounded-full">On Request Only</span>
+                  ) : (
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-slate-900">₦{finalTotal?.toLocaleString(undefined, { maximumFractionDigits: 0 }) || 0}</span>
+                      {isCalculated && rawTotal! < 5000 && (
+                        <div className="text-[10px] text-slate-500 mt-0.5 max-w-[200px] leading-tight text-right">
+                          Note: Minimum print order is ₦5,000 to cover production costs.
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
 
             <div className="space-y-1.5">
               <div className="flex justify-between items-center">
@@ -372,7 +487,7 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
               <div className="text-sm leading-6">
                 <label htmlFor="agreeToTerms" className="text-slate-600 cursor-pointer select-none">
                   By submitting artwork, you agree to BOMedia's{' '}
-                  <button type="button" onClick={() => setShowTermsModal(true)} className="text-primary-700 hover:text-primary-800 underline font-medium">Terms of Service</button>.
+                  <Button type="button" variant="link" onClick={() => setShowTermsModal(true)} className="p-0 h-auto text-primary-700 hover:text-primary-800 font-medium">Terms of Service</Button>.
                 </label>
               </div>
             </div>

@@ -7,12 +7,40 @@ const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-      <div className="container mx-auto px-6">
+    <footer className="w-full">
+      {/* Top Contact Bar */}
+      <div className="bg-slate-50 relative">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8cc63f] via-[#00a2e8] to-[#2e388d]" />
+        <div className="container mx-auto max-w-[960px] px-6 py-6 mt-1">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6 w-full">
+            
+            {/* Left Side: Avatars & Text */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 text-center md:text-left">
+              <div className="flex -space-x-3">
+                <img src="avatar/avatar-contact.png" alt="Team" className="w-10 h-10 rounded-full border-2 border-white object-cover grayscale opacity-90" />
+              </div>
+              <span className="font-bold text-slate-800 text-xl">Feel free to contact us</span>
+            </div>
+
+            {/* Right Side: Contact Links */}
+            <div className="flex flex-col lg:flex-row items-center gap-2 lg:gap-3 text-slate-800 font-bold text-base">
+             
+              <span className="hidden lg:inline text-slate-300 font-normal">|</span>
+              <a href="tel:+2348022247567" className="hover:text-[#2e388d] transition-colors">+2348022247567</a>
+              <span className="hidden lg:inline text-slate-300 font-normal">|</span>
+              <a href="mailto:info@bomedia.com.ng" className="hover:text-[#2e388d] transition-colors">info@bomedia.com.ng</a>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div className="container mx-auto max-w-[960px] px-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
           {/* Brand Section */}
-          <div className="md:col-span-1">
+          <div className="md:col-span-2 pr-4">
              <div className="flex items-center space-x-2 mb-4">
               <div className="h-8 w-8 flex-shrink-0">
                 <svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 40 40">
@@ -28,63 +56,33 @@ const Footer: React.FC = () => {
                   </g>
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-white">Broad Options Media - BOMedia</h3>
+              <h3 className="text-xl font-bold text-white">Broad Options Media</h3>
             </div>
             <p className="text-sm leading-relaxed mb-4">
               We help Lagos brands and organisations produce high-quality large-format prints with fast turnaround and consistent results.
             </p>
+            <div className="mb-4">
+              <h4 className="text-white font-semibold text-sm mb-1">Service Areas</h4>
+              <p className="text-sm leading-relaxed text-slate-400">
+                Lagos: Lekki, Victoria Island, Ikeja, Yaba, Surulere, and nearby areas.
+              </p>
+            </div>
             <p className="text-xs text-slate-500">BN7243402</p>
           </div>
 
-          {/* Service Areas */}
+          {/* Quick Links */}
           <div>
-            <h4 className="text-white font-semibold mb-3">Service Areas</h4>
-            <p className="text-sm leading-relaxed">
-              We deliver printed materials across Lagos, including Lekki, Victoria Island, Ikeja, Yaba, Surulere, and nearby areas.
-            </p>
-          </div>
-
-          {/* Connect With Us */}
-          <div>
-            <h4 className="text-white font-semibold mb-3">Connect With Us</h4>
+            <h4 className="text-white font-semibold mb-3">Quick Links</h4>
             <div className="space-y-2 text-sm">
-              <a
-                href="https://www.facebook.com/bomedia03"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-white transition-colors"
-                aria-label="Facebook"
-              >
-                <Facebook className="w-4 h-4" />
-                Facebook
-              </a>
-              <a
-                href="https://www.instagram.com/bomedia03"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-white transition-colors"
-              >
-                <Instagram className="w-4 h-4" />
-                Instagram
-              </a>
-              <a
-                href="mailto:info@bomedia.com.ng"
-                className="flex items-center gap-2 hover:text-white transition-colors"
-              >
-                <Mail className="w-4 h-4" />
-                info@bomedia.com.ng
-              </a>
-              <a
-                href="https://www.google.com/maps/search/?api=1&query=Lagos+Nigeria"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:text-white transition-colors"
-              >
-                <MapPin className="w-4 h-4" />
-                Lagos, Nigeria
-              </a>
+              <Link href="/#services" className="block hover:text-white transition-colors">What we print</Link>
+              <Link href="/cost-calculator" className="block hover:text-white transition-colors">Calculator</Link>
+              <Link href="/#how-it-works" className="block hover:text-white transition-colors">How it works</Link>
+              <Link href="/#gallery" className="block hover:text-white transition-colors">Gallery</Link>
+              <Link href="/#faq" className="block hover:text-white transition-colors">FAQ</Link>
             </div>
           </div>
+
+
 
           {/* Legal Links */}
           <div>
@@ -97,10 +95,44 @@ const Footer: React.FC = () => {
 
         </div>
 
-        {/* Copyright */}
-        <div className="border-t border-slate-800 pt-6 text-center text-sm">
-          &copy; {currentYear} BOMedia. All rights reserved.
+        {/* Copyright & Social */}
+        <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
+          <div className="text-left">
+            &copy; {currentYear} BOMedia. All rights reserved.
+          </div>
+          <div className="flex items-center gap-4">
+            <a
+              href="https://www.facebook.com/bomedia03"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+              aria-label="Facebook"
+            >
+              <Facebook className="w-5 h-5" />
+            </a>
+            <a
+              href="https://www.instagram.com/bomedia03"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+              aria-label="Instagram"
+            >
+              <Instagram className="w-5 h-5" />
+            </a>
+            <a
+              href="https://www.tiktok.com/@bomedia03"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors"
+              aria-label="TikTok"
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z" />
+              </svg>
+            </a>
+          </div>
         </div>
+      </div>
       </div>
     </footer>
   );

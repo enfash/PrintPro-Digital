@@ -4,36 +4,36 @@
 
 @layer base {
   :root {
-    --background: 226 83% 97%; /* #f0f3fc */
-    --foreground: 229 42% 32%; /* #2a3476 */
+    --background: 233 44% 98%; /* #f8f9fc */
+    --foreground: 234 51% 20%; /* #181d4a */
 
     --card: 0 0% 100%;
-    --card-foreground: 229 42% 32%;
+    --card-foreground: 234 51% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 229 42% 32%;
+    --popover-foreground: 234 51% 20%;
 
-    --primary: 229 58% 54%; /* #4659cd */
+    --primary: 234 51% 37%; /* #2e388d */
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 227 70% 92%; /* #e0e7f8 */
-    --secondary-foreground: 229 42% 32%;
+    --secondary: 233 44% 92%; /* #e4e6f4 */
+    --secondary-foreground: 234 51% 37%;
 
-    --muted: 227 70% 92%; /* #e0e7f8 */
-    --muted-foreground: 229 25% 55%;
+    --muted: 233 44% 92%;
+    --muted-foreground: 234 20% 50%;
 
-    --accent: 256 65% 62%; /* #8263DA */
+    --accent: 280 65% 60%; /* Vibrant accent, optional */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 227 70% 92%; /* #e0e7f8 */
-    --input: 227 70% 92%; /* #e0e7f8 */
-    --ring: 229 51% 60%; /* #5b74da */
+    --border: 233 44% 92%;
+    --input: 233 44% 92%;
+    --ring: 234 51% 37%;
 
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
+    --chart-1: 234 51% 37%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
@@ -74,5 +74,22 @@
   .no-scrollbar {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  .animate-slide-up-fade {
+    animation: slideUpFade 1s ease forwards;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+}
+
+@keyframes slideUpFade {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

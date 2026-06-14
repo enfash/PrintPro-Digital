@@ -133,6 +133,10 @@ export async function submitContactForm(
     phone: formData.get('phone'),
     email: formData.get('email'),
     jobType: formData.get('jobType'),
+    width: formData.get('width'),
+    height: formData.get('height'),
+    unit: formData.get('unit'),
+    qty: formData.get('qty'),
     message: formData.get('message'),
     file: formData.get('file'),
     agreeToTerms: formData.get('agreeToTerms') === 'on',
@@ -146,7 +150,7 @@ export async function submitContactForm(
     };
   }
 
-  const { name, phone, email, jobType, message, file } = validatedFields.data;
+  const { name, phone, email, jobType, width, height, unit, qty, message, file } = validatedFields.data;
 
   // Cryptographically random 6-char hex reference ID
   const refId = randomBytes(3).toString('hex').toUpperCase();
@@ -203,7 +207,7 @@ export async function submitContactForm(
       await db.collection('submissions').doc(refId).set({
         refId, name, phone,
         email: email || '',
-        jobType, message,
+        jobType, width, height, unit, qty, message,
         filePath,     // store path so admins can retrieve the file at any time
         fileName, fileSize,
         agreeToUpdates: validatedFields.data.agreeToTerms,
@@ -218,7 +222,7 @@ export async function submitContactForm(
   if (resend && process.env.RESEND_FROM_EMAIL && process.env.RESEND_TO_EMAIL) {
     try {
       const adminEmailHTML = generateAdminEmailHTML({
-        name, phone, email, jobType, message,
+        name, phone, email, jobType, width, height, unit, qty, message,
         fileName: fileName || undefined,
         fileSize: fileSize || undefined,
         fileUrl: fileSignedUrl || undefined,
