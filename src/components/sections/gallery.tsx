@@ -87,10 +87,13 @@ const Gallery: React.FC = () => {
               return (
                 <div
                   key={`${item.id}-${startIndex}`}
+                  role="button"
+                  tabIndex={0}
                   className={`group relative cursor-pointer overflow-hidden rounded-3xl w-full h-[min(28rem,50vh)] transition-[width] duration-500 ease-in-out ${isActive ? 'md:w-[46%]' : 'md:w-[18%]'
                     }`}
                   onMouseEnter={() => setActiveIndex(index)}
                   onClick={() => setPreviewImage(item)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPreviewImage(item); }}
                 >
                   <Image
                     src={item.imageUrl}
@@ -118,8 +121,11 @@ const Gallery: React.FC = () => {
               {mobileVisibleItems.map((item) => (
                 <div
                   key={item.id}
+                  role="button"
+                  tabIndex={0}
                   className="group relative cursor-pointer overflow-hidden rounded-2xl aspect-[4/5]"
                   onClick={() => setPreviewImage(item)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setPreviewImage(item); }}
                 >
                   <Image
                     src={item.imageUrl}
