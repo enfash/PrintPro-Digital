@@ -24,7 +24,7 @@ export default function Hero() {
   }, [heroImages.length]);
 
   return (
-    <section className="relative pt-32 pb-20 lg:pt-32 lg:pb-20 overflow-hidden flex items-center justify-center min-h-[75vh] lg:min-h-[480px] bg-slate-900">
+    <section className="relative pt-32 pb-20 lg:pt-32 lg:pb-20 overflow-hidden flex items-center justify-center min-h-[75vh] lg:min-h-[75vh] lg:max-h-[760px] bg-slate-900">
       
       {/* Background Image Slider */}
       <div className="absolute inset-0 z-0 bg-slate-900">
@@ -52,7 +52,7 @@ export default function Hero() {
         <div className="absolute inset-0 bg-slate-900/75 z-10"></div>
       </div>
 
-      <div className="container relative z-20 mx-auto max-w-[960px] px-6">
+      <div className="site-container relative z-20">
         <div className="max-w-3xl mx-auto text-center">
 
           {/* Badge */}

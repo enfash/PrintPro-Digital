@@ -52,6 +52,14 @@
   html {
     scroll-behavior: smooth;
   }
+
+  /* Prevent fixed elements layout shift when Radix UI locks scrolling */
+  header {
+    padding-right: var(--removed-body-scroll-bar-size, 0px) !important;
+  }
+  .whatsapp-float-btn {
+    margin-right: var(--removed-body-scroll-bar-size, 0px) !important;
+  }
 }
 
 @layer components {
@@ -67,6 +75,24 @@
 }
 
 @layer utilities {
+  .site-container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  @media (min-width: 1024px) {
+    .site-container {
+      max-width: 960px;
+    }
+  }
+  @media (min-width: 1440px) {
+    .site-container {
+      max-width: 1140px;
+    }
+  }
+
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }

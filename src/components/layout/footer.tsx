@@ -14,13 +14,13 @@ const Footer: React.FC = () => {
       {/* Top Contact Bar */}
       <div className="bg-slate-50 relative">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#8cc63f] via-[#00a2e8] to-[#2e388d]" />
-        <div className="container mx-auto max-w-[960px] px-4 py-4">
+        <div className="site-container py-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-6 w-full">
             
             {/* Left Side: Avatars & Text */}
             <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 text-center md:text-left">
               <div className="flex -space-x-3">
-                <img src="avatar/avatar-contact.png" alt="Team" className="w-10 h-10 rounded-full border-2 border-white object-cover grayscale opacity-90" />
+                <img src="/avatar/avatar-contact.png" alt="Team" className="w-10 h-10 rounded-full border-2 border-white object-cover grayscale opacity-90" />
               </div>
               <span className="font-bold text-slate-800 text-xl">Feel free to contact us</span>
             </div>
@@ -39,7 +39,7 @@ const Footer: React.FC = () => {
       </div>
 
       <div className="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
-        <div className="container mx-auto max-w-[960px] px-6">
+        <div className="site-container">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
 
           {/* Brand Section */}

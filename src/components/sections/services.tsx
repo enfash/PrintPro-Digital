@@ -5,6 +5,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { SERVICES } from '@/lib/constants';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
+import CostCalculator from '@/components/calculator/CostCalculator';
 
 const Services: React.FC = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -30,7 +32,7 @@ const Services: React.FC = () => {
 
   return (
     <section id="services" className="py-16 lg:py-18 bg-white relative scroll-mt-16">
-      <div className="container mx-auto max-w-[960px] px-6">
+      <div className="site-container">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-2 inline-block relative group cursor-default">
             Large-Format Printing Services in Lagos
@@ -74,9 +76,17 @@ const Services: React.FC = () => {
             <p className="text-sm text-slate-500">Based on size, material, quantity, and finishing. Clear, upfront quotes — no hidden charges.</p>
             <p className="text-xs text-slate-400 mt-2">Perfect for: Marketing Agencies, Real Estate, Event Planners, and Retail Businesses.</p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/#contact">Get a quote &rarr;</Link>
-          </Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm" className="cursor-pointer">
+                Get a quote &rarr;
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[95vw] md:max-w-4xl p-0 border-0 bg-transparent shadow-none [&>button]:hidden">
+              <DialogTitle className="sr-only">Print Cost Calculator</DialogTitle>
+              <CostCalculator />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </section>

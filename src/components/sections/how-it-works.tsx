@@ -32,7 +32,7 @@ const HowItWorks: React.FC = () => {
 
   return (
     <section id="how-it-works" className="py-16 lg:py-18 bg-slate-50 scroll-mt-16">
-      <div className="container mx-auto max-w-[960px] px-6">
+      <div className="site-container">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-2 inline-block relative group cursor-default">
             How It Works

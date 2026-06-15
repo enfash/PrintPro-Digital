@@ -39,7 +39,7 @@ const WhatsAppFloat: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => handleTrackedClick('whatsapp_float')}
-            className={`fixed ${bottomClass} right-6 z-40 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 transform hover:scale-110 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
+            className={`fixed ${bottomClass} right-6 z-40 bg-green-600 hover:bg-green-700 text-white p-4 rounded-full shadow-2xl transition-[transform,opacity,colors] duration-300 transform hover:scale-110 whatsapp-float-btn ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-20 opacity-0 pointer-events-none'
                 }`}
             aria-label="Chat on WhatsApp"
         >

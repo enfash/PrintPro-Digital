@@ -139,6 +139,9 @@ export async function submitContactForm(
     qty: formData.get('qty'),
     message: formData.get('message'),
     file: formData.get('file'),
+    uploadedFilePath: formData.get('uploadedFilePath'),
+    uploadedFileName: formData.get('uploadedFileName'),
+    uploadedFileSize: formData.get('uploadedFileSize'),
     agreeToTerms: formData.get('agreeToTerms') === 'on',
   });
 
@@ -150,7 +153,7 @@ export async function submitContactForm(
     };
   }
 
-  const { name, phone, email, jobType, width, height, unit, qty, message, file } = validatedFields.data;
+  const { name, phone, email, jobType, width, height, unit, qty, message, file, uploadedFilePath, uploadedFileName, uploadedFileSize } = validatedFields.data;
 
   // Cryptographically random 6-char hex reference ID
   const refId = randomBytes(3).toString('hex').toUpperCase();
@@ -160,7 +163,32 @@ export async function submitContactForm(
   let fileName: string | null = null;
   let fileSize: number | null = null;
 
-  if (file && file.size > 0) {
+  if (uploadedFilePath) {
+    filePath = uploadedFilePath;
+    fileName = uploadedFileName || null;
+    fileSize = uploadedFileSize ? parseInt(uploadedFileSize) : null;
+
+    if (adminApp) {
+      try {
+        const storage = getStorage(adminApp);
+        const bucket = storage.bucket();
+        const fileRef = bucket.file(filePath);
+
+        // Generate a 7-day signed URL for the admin email
+        try {
+          const [signedUrl] = await fileRef.getSignedUrl({
+            action: 'read',
+            expires: Date.now() + 7 * 24 * 60 * 60 * 1000,
+          });
+          fileSignedUrl = signedUrl;
+        } catch (signedUrlError) {
+          console.warn('⚠️ Could not generate signed URL for pre-uploaded file:', signedUrlError);
+        }
+      } catch (e) {
+        console.error('❌ Failed to fetch pre-uploaded file:', e);
+      }
+    }
+  } else if (file && file.size > 0) {
     fileName = file.name;
     fileSize = file.size;
     const arrayBuffer = await file.arrayBuffer();
@@ -190,8 +218,6 @@ export async function submitContactForm(
         });
         fileSignedUrl = signedUrl;
       } catch (signedUrlError) {
-        // Requires the service account to have roles/iam.serviceAccountTokenCreator.
-        // File is uploaded but the admin email won't have a download link.
         console.warn('⚠️ Could not generate signed URL — file uploaded but link unavailable:', signedUrlError);
       }
 

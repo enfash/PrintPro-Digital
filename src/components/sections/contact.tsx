@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useActionState, useTransition } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useFormStatus, createPortal } from 'react-dom';
 import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle, Info, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { ref, uploadBytesResumable } from 'firebase/storage';
+import { storage } from '@/firebase/config';
 import { WHATSAPP_LINK, PHONE_DISPLAY, EMAIL_DISPLAY } from '@/lib/constants';
 import TermsModal from '../modals/TermsModal';
 import Link from 'next/link';
@@ -78,7 +80,7 @@ const Contact: React.FC = () => {
 
   return (
     <section id="contact" className="py-16 lg:py-18 bg-white scroll-mt-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="site-container px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16">
           <div>
             <div className="mb-8">
@@ -153,6 +155,62 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [isPending, startTransition] = useTransition();
 
+  // Client-side Firebase Storage upload state
+  const [mounted, setMounted] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [bytesUploaded, setBytesUploaded] = useState(0);
+  const [totalBytes, setTotalBytes] = useState(0);
+  const [uploadedFileDetails, setUploadedFileDetails] = useState<{ path: string; name: string; size: string } | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+
+    if (typeof window !== 'undefined') {
+      const handleSearchParams = () => {
+        const params = new URLSearchParams(window.location.search);
+        const service = params.get('service');
+        if (service) {
+          let matchedJob = '';
+          let messagePrefill = '';
+          
+          if (service === 'Flex Banners' || service === 'Flex Banner') {
+            matchedJob = 'Flex Banner';
+          } else if (service === 'Roll-ups' || service === 'Roll-up') {
+            matchedJob = 'Other';
+            messagePrefill = 'Hi BOMedia, I would like to get a quote for Roll-up banners. ';
+          } else if (service === 'Stickers & Vinyl' || service === 'SAV') {
+            matchedJob = 'Self-Adhesive Vinyl (SAV)';
+          } else if (service === 'Vehicle Branding') {
+            matchedJob = 'Other';
+            messagePrefill = 'Hi BOMedia, I would like to get a quote for Vehicle Branding. ';
+          } else if (service === 'Wall & Office Graphics') {
+            matchedJob = 'Other';
+            messagePrefill = 'Hi BOMedia, I would like to get a quote for Wall & Office Graphics. ';
+          }
+          
+          if (matchedJob) {
+            setSelectedJob(matchedJob);
+            if (jobTypeRef.current) {
+              jobTypeRef.current.value = matchedJob;
+            }
+            if (messagePrefill && messageRef.current && !messageRef.current.value) {
+              messageRef.current.value = messagePrefill;
+            }
+          }
+        }
+      };
+      
+      setTimeout(handleSearchParams, 50);
+      window.addEventListener('popstate', handleSearchParams);
+      window.addEventListener('hashchange', handleSearchParams);
+      return () => {
+        window.removeEventListener('popstate', handleSearchParams);
+        window.removeEventListener('hashchange', handleSearchParams);
+      };
+    }
+  }, []);
+
   // Added state for cost calculation
   const [selectedJob, setSelectedJob] = useState<string>('');
   const [width, setWidth] = useState<string>('');
@@ -206,23 +264,42 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     }
   }, [state, toast]);
 
+  const getJobTypeFolder = (jobType: string): string => {
+    switch (jobType) {
+      case 'Flex Banner': return 'flex-banner';
+      case 'Self-Adhesive Vinyl (SAV)': return 'sav';
+      case 'Window / Clear Sticker': return 'window-clear-sticker';
+      default: return 'other';
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const selectedFile = e.target.files[0];
       const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+
+      setUploadedFileDetails(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.disabled = false;
+      }
 
       if (selectedFile.size > MAX_FILE_SIZE) {
         const largeFileWhatsappLink = `https://wa.me/2348022247567?text=${encodeURIComponent(`Hi BOMedia, I'm trying to send a large file (${(selectedFile.size / 1024 / 1024).toFixed(1)}MB) for my order.`)}`;
         
         toast({
           variant: "default",
-          title: "File size notice",
+          title: "File exceeds 25MB limit",
           description: (
             <div className="flex flex-col gap-2 text-foreground">
-                <p>
-                  Uploads are limited to <strong>25MB</strong>. Please send larger files via <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="text-primary-600 underline font-medium">WhatsApp</a> or WeTransfer, then share the link in the message box.
+                <p className="text-sm">
+                  Uploads are limited to <strong>25MB</strong>. For larger files, please submit this request and send your artwork separately via:
                 </p>
-                <p className="text-xs text-slate-500">You can still submit your request.</p>
+                <ul className="list-disc pl-4 text-xs space-y-1">
+                  <li>📧 Email: <a href="mailto:info@bomedia.com.ng" className="text-primary-600 underline font-medium">info@bomedia.com.ng</a></li>
+                  <li>🔗 <a href="https://wetransfer.com" target="_blank" rel="noopener noreferrer" className="text-primary-600 underline font-medium">WeTransfer</a> (share the link in the message box)</li>
+                  <li>💬 <a href={largeFileWhatsappLink} target="_blank" rel="noopener noreferrer" className="text-primary-600 underline font-medium">WhatsApp</a></li>
+                </ul>
+                <p className="text-xs text-slate-500 mt-1">We cleared the file field so you can proceed with submitting details.</p>
             </div>
           ),
           duration: 10000,
@@ -236,11 +313,14 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
         return;
       }
 
-      if (!ACCEPTED_FILE_TYPES.includes(selectedFile.type)) {
+      const fileExt = selectedFile.name.split('.').pop()?.toLowerCase();
+      const isAcceptedType = ACCEPTED_FILE_TYPES.includes(selectedFile.type) || (fileExt && ['tiff', 'tif', 'eps', 'ai', 'psd', 'cdr'].includes(fileExt));
+
+      if (!isAcceptedType) {
         toast({
           variant: "destructive",
           title: "Invalid file type",
-          description: "Please upload a JPG, PNG, PDF, AI, PSD, or CDR file.",
+          description: "Please upload a JPG, PNG, PDF, AI, PSD, CDR, EPS, or TIFF file.",
         });
         // Clear the input value
         if (fileInputRef.current) {
@@ -295,12 +375,25 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
   const clearFile = (e: React.MouseEvent) => {
     e.preventDefault();
     setFile(null);
+    setUploadedFileDetails(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+      fileInputRef.current.disabled = false;
     }
   };
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  useEffect(() => {
+    if (uploadedFileDetails && formRef.current) {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.disabled = true;
+      }
+      formRef.current.requestSubmit();
+    }
+  }, [uploadedFileDetails]);
+
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    // 1. Validation
     let isValid = true;
     let firstInvalidField: HTMLElement | null = null;
     
@@ -324,6 +417,60 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
     if (!isValid) {
       e.preventDefault(); // Prevent form submission
       firstInvalidField?.focus();
+      return;
+    }
+
+    // 2. Client-side Upload Interception (if file is present and not uploaded yet)
+    if (file && !uploadedFileDetails) {
+      e.preventDefault(); // Intercept HTML form submission
+
+      setUploading(true);
+      setUploadProgress(0);
+      setBytesUploaded(0);
+      setTotalBytes(file.size);
+
+      try {
+        const jobTypeFolder = getJobTypeFolder(selectedJob);
+        // Cryptographically random 6-char hex reference ID
+        const refId = Array.from(crypto.getRandomValues(new Uint8Array(3)))
+          .map(b => b.toString(16).padStart(2, '0').toUpperCase())
+          .join('');
+        const filePath = `submissions/${jobTypeFolder}/${refId}-${file.name}`;
+        const storageRef = ref(storage, filePath);
+
+        const uploadTask = uploadBytesResumable(storageRef, file);
+
+        await new Promise<void>((resolve, reject) => {
+          uploadTask.on(
+            'state_changed',
+            (snapshot) => {
+              const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+              setUploadProgress(progress);
+              setBytesUploaded(snapshot.bytesTransferred);
+            },
+            (error) => {
+              console.error('Firebase upload error:', error);
+              reject(error);
+            },
+            () => {
+              resolve();
+            }
+          );
+        });
+
+        setUploadedFileDetails({
+          path: filePath,
+          name: file.name,
+          size: file.size.toString(),
+        });
+      } catch (error) {
+        setUploading(false);
+        toast({
+          variant: 'destructive',
+          title: 'Upload Failed',
+          description: 'Failed to upload your design file. Please try again or submit without a file.',
+        });
+      }
     }
   };
 
@@ -345,6 +492,10 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
           </div>
         ) : (
           <form ref={formRef} action={formAction} onSubmit={handleFormSubmit} className="space-y-4">
+            <input type="hidden" name="uploadedFilePath" value={uploadedFileDetails?.path || ''} />
+            <input type="hidden" name="uploadedFileName" value={uploadedFileDetails?.name || ''} />
+            <input type="hidden" name="uploadedFileSize" value={uploadedFileDetails?.size || ''} />
+            
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label htmlFor="name" className="text-sm font-medium text-slate-700">Name <span className="text-red-500">*</span></label>
@@ -478,6 +629,32 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
                 </label>
               </div>
               {state.errors?.file && <p className="text-xs text-red-600">{state.errors.file[0]}</p>}
+
+              {file && (
+                <div className="mt-3 p-4 bg-slate-100/80 rounded-xl border border-slate-200/60 backdrop-blur-sm space-y-2.5">
+                  <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-700 uppercase tracking-wider">
+                    <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                    Artwork Pre-flight Checklist
+                  </div>
+                  <p className="text-xs text-slate-500 leading-normal mb-1">
+                    Please confirm that your file meets these settings for the best print quality:
+                  </p>
+                  <div className="grid grid-cols-1 gap-2 text-xs text-slate-700">
+                    <label className="flex items-start gap-2 cursor-pointer select-none">
+                      <input type="checkbox" defaultChecked className="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                      <span>🎨 <strong>CMYK Color Mode:</strong> Prevent color shifts by exporting in CMYK rather than RGB.</span>
+                    </label>
+                    <label className="flex items-start gap-2 cursor-pointer select-none">
+                      <input type="checkbox" defaultChecked className="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                      <span>🔤 <strong>Convert Text to Outlines/Curves:</strong> Prevents missing font issues.</span>
+                    </label>
+                    <label className="flex items-start gap-2 cursor-pointer select-none">
+                      <input type="checkbox" defaultChecked className="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer" />
+                      <span>📐 <strong>Resolution (150+ DPI) & Scale:</strong> Keeps your print crisp and clear.</span>
+                    </label>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-start gap-3 pt-2 pb-1">
@@ -499,6 +676,38 @@ const ContactForm: React.FC<{ onReset: () => void }> = ({ onReset }) => {
               We’ll review your details and respond shortly. See our <Link href="/privacy-policy" className="underline">Privacy Policy</Link>.
             </p>
           </form>
+        )}
+
+        {uploading && mounted && createPortal(
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md transition-all duration-300">
+            <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-100 max-w-sm w-full mx-4 space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 bg-indigo-50 rounded-xl text-indigo-600 animate-pulse">
+                  <Upload className="h-6 w-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-slate-900">Uploading Artwork...</h4>
+                  <p className="text-xs text-slate-500">Please keep this tab open.</p>
+                </div>
+              </div>
+              
+              <div className="space-y-1.5">
+                <div className="h-2.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-[#2e388d] rounded-full transition-all duration-300 ease-out" 
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs font-semibold text-slate-600">
+                  <span>{uploadProgress}%</span>
+                  <span>
+                    {(bytesUploaded / 1024 / 1024).toFixed(1)} MB of {(totalBytes / 1024 / 1024).toFixed(1)} MB
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>,
+          document.body
         )}
       </div>
       <TermsModal isOpen={showTermsModal} onClose={() => setShowTermsModal(false)} />

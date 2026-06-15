@@ -45,7 +45,7 @@ const Gallery: React.FC = () => {
   return (
     <>
       <section id="gallery" className="py-16 lg:py-18 bg-white relative scroll-mt-16">
-        <div className="container mx-auto max-w-[960px] px-6">
+        <div className="site-container">
           <div className="mb-12 flex justify-between items-end">
             <div>
               <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl mb-2 inline-block relative group cursor-default">
@@ -78,7 +78,7 @@ const Gallery: React.FC = () => {
           </div>
         </div>
 
-        <div className="container mx-auto max-w-[1200px] px-6">
+        <div className="site-container">
           {/* Desktop Slider */}
           <div className="hidden md:flex flex-col md:flex-row w-full items-center justify-center gap-3">
             {visibleItems.map((item, index) => {
