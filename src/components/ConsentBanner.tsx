@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
  
-function gtag(...args: any[]) {
+function gtag(..._args: any[]) {
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push(arguments);
 }

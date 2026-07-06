@@ -5,10 +5,7 @@ import {
   Scan,
   MessageSquare,
   FileCheck,
-  Truck,
-  Image as ImageIcon,
-  Car,
-  LayoutTemplate
+  Truck
 } from 'lucide-react';
 import { NavItem, ServiceItem, TimelineStep, FAQItem } from './types';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Facebook, Instagram, Mail, MapPin } from 'lucide-react';
+import { Facebook, Instagram } from 'lucide-react';
 import Link from 'next/link';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
 import CostCalculator from '@/components/calculator/CostCalculator';

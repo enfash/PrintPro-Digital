@@ -113,7 +113,7 @@ function getJobTypeFolder(jobType: string): string {
 }
 
 export async function submitContactForm(
-  prevState: ContactFormState,
+  _prevState: ContactFormState,
   formData: FormData
 ): Promise<ContactFormState> {
 

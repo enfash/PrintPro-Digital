@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const Header: React.FC = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileWhatWePrintOpen, setIsMobileWhatWePrintOpen] = useState(false);
@@ -38,7 +37,6 @@ const Header: React.FC = () => {
       }
 
       lastScrollY.current = currentScrollY;
-      setIsScrolled(currentScrollY > 20);
 
       // Clear the previous timeout
       if (scrollTimeout.current) {

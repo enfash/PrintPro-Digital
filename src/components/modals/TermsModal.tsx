@@ -2,7 +2,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
 import { Button } from '../ui/button';
-import Link from 'next/link';
 
 interface TermsModalProps {
     isOpen: boolean;

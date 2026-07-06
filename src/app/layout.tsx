@@ -1,10 +1,9 @@
 
 import type {Metadata} from 'next';
 import './globals.css';
-import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster"
 import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
-import { GoogleTagManager } from '@next/third-parties/google';
+import { GoogleTagManager, GoogleAnalytics } from '@next/third-parties/google';
 import ConsentBanner from '@/components/ConsentBanner';
 
 export const metadata: Metadata = {
@@ -207,6 +206,7 @@ export default function RootLayout({
       </head>
       <body className="bg-slate-50 text-slate-900 antialiased selection:bg-primary-200 selection:text-primary-900 font-sans" suppressHydrationWarning>
         <GoogleTagManager gtmId="GTM-PF8CQGCX" />
+        <GoogleAnalytics gaId="G-P3K7152RF8" />
         <FirebaseErrorListener />
         <SmoothScrollProvider>
           {children}

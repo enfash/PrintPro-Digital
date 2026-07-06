@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useActionState, useTransition } from 'react';
 import { useFormStatus, createPortal } from 'react-dom';
-import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle, Info, Calculator } from 'lucide-react';
+import { Loader2, Upload, X, MessageCircle, CheckCircle, Phone, Mail, FileCheck, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ref, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '@/firebase/config';
@@ -14,8 +14,7 @@ import { submitContactForm } from '@/lib/actions';
 import { ACCEPTED_FILE_TYPES } from '@/lib/schema';
 import { suggestOrderTemplate } from '@/ai/flows/order-reference-suggestion';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Dialog, DialogContent, DialogTrigger, DialogTitle } from '@/components/ui/dialog';
-import CostCalculator from '@/components/calculator/CostCalculator';
+
 
 
 const initialFormState = {
